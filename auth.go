@@ -17,14 +17,20 @@ type User struct {
 	HashedPass string
 }
 
-func CreateUser(email string, password string, usersByID UsersByID) (*User, error) {
+type CreatedUserEventData struct {
+	Data User
+}
+
+func CreateUser(email string, password string, usersByID UsersByID) (CreatedUserEventData, error) {
 	if usersByID[email] != nil {
-		return &User{}, ErrEmailExists
+		return CreatedUserEventData{}, ErrEmailExists
 	}
 
-	user := &User{
-		ID:    email,
-		Email: email,
+	ed := CreatedUserEventData{
+		Data: User{
+			ID:    email,
+			Email: email,
+		},
 	}
-	return user, nil
+	return ed, nil
 }

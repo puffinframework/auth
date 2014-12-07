@@ -1,26 +1,30 @@
 package auth
 
 import (
-	"fmt"
+	"errors"
+)
+
+var (
+	ErrEmailExists error = errors.New("auth: email exists")
 )
 
 type UsersByID map[string]*User
 
 type User struct {
-	ID         string
+	ID         string // set to Email
 	Email      string
 	Hash       string
 	HashedPass string
 }
 
-func SignUp(email string, password string, usersByID UsersByID) error {
+func CreateUser(email string, password string, usersByID UsersByID) (*User, error) {
 	if usersByID[email] != nil {
-		return fmt.Errorf("Email exists.")
+		return &User{}, ErrEmailExists
 	}
 
-	usersByID[email] = &User{
+	user := &User{
 		ID:    email,
 		Email: email,
 	}
-	return nil
+	return user, nil
 }

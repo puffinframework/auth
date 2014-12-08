@@ -7,43 +7,34 @@ import (
 	"time"
 )
 
-type Snapshot struct {
-	seqNum    time.Time
-	usersByID UsersByID
-}
+var (
+	ErrEmailExists error = errors.New("auth: email exists")
+)
 
-type UsersByID map[string]*User
+type UsedEmailsMap map[string]bool
+
+type UsersByID map[string]User
 
 type User struct {
-	ID         string // set to Email
+	Id         string
 	Email      string
 	Hash       string
 	HashedPass string
 }
 
-type CreatedUserEventData struct {
-	Data User
+type CreatedUserEvent struct {
+	Header event.Header
+	Data   User
 }
 
-var (
-	ErrEmailExists error = errors.New("auth: email exists")
-)
-
-type Auth struct {
-	es *event.Store
-	ss *snapshot.Store
-}
-
-func (self *Auth) CreateUser(email string, password string, usersByID UsersByID) (CreatedUserEventData, error) {
-	if usersByID[email] != nil {
-		return CreatedUserEventData{}, ErrEmailExists
+func CreateUser(email string, password string, emailsMap UsedEmailsMap) (CreatedUserEvent, error) {
+	if emailsMap[email] != nil {
+		return CreatedUserEvent{}, ErrEmailExists
 	}
 
-	ed := CreatedUserEventData{
-		Data: User{
-			ID:    email,
-			Email: email,
-		},
+	evt := CreatedUserEvent{
+		Header: event.NewEvent("CreatedUser", 1),
+		Data:   User{Id: email, Email: email},
 	}
-	return ed, nil
+	return evt, nil
 }

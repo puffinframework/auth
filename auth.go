@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/puffinframework/event"
 	"github.com/puffinframework/snapshot"
+	"github.com/satori/go.uuid"
 	"time"
 )
 
@@ -19,7 +20,7 @@ type User struct {
 	HashedPass string
 }
 
-type UsersById map[string]User
+type UserById map[string]User
 
 type UserIdByEmail map[string]string
 
@@ -28,22 +29,24 @@ type CreatedUserEvent struct {
 	Data   User
 }
 
-func CreateUser(appId string, email string, password string, userIdByEmail UserIdByEmail) (CreatedUserEvent, error) {
-	if userIdByEmail[email] == appId {
+func CreateUser(appId string, email string, password string, userById UserById, userIdByEmail UserIdByEmail) (CreatedUserEvent, error) {
+	otherId := userIdByEmail[email]
+	otherUser := userById[otherId]
+	if otherUser.AppId == appId {
 		return CreatedUserEvent{}, ErrEmailUsed
 	}
 
 	evt := CreatedUserEvent{
 		Header: event.NewHeader("CreatedUser", 1),
-		Data:   User{AppId: appId, Id: email, Email: email},
+		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email},
 	}
 	return evt, nil
 }
 
-func OnCreatedUser(evt CreatedUserEvent, userIdByEmail UserIdByEmail, usersById UsersById) error {
+func OnCreatedUser(evt CreatedUserEvent, userById UserById, userIdByEmail UserIdByEmail) error {
 	user := evt.Data
-	userIdByEmail[user.Email] = user.AppId
-	usersById[user.Id] = user
+	userById[user.Id] = user
+	userIdByEmail[user.Email] = user.Id
 	return nil
 }
 
@@ -57,9 +60,9 @@ type authImpl struct {
 }
 
 type authSnapshot struct {
-	LastEventDt  time.Time
+	LastEventDt   time.Time
 	UserIdByEmail UserIdByEmail
-	UsersById    UsersById
+	UserById     UserById
 }
 
 func NewAuth(es event.Store, ss snapshot.Store) Auth {
@@ -70,7 +73,7 @@ func (self *authImpl) CreateUser(appId string, email string, password string) er
 	snapshot := &authSnapshot{}
 	self.ss.MustLoadSnapshot("AuthSnapshot", snapshot)
 
-	evt, err := CreateUser(appId, email, password, snapshot.UserIdByEmail)
+	evt, err := CreateUser(appId, email, password, snapshot.UserById, snapshot.UserIdByEmail)
 	if err != nil {
 		return err
 	}
@@ -87,7 +90,7 @@ func (self *authImpl) ProcessEvents() {
 		case "CreatedUser":
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
-			/* err := */ OnCreatedUser(CreatedUserEvent{Header: header, Data: user}, snapshot.UserIdByEmail, snapshot.UsersById)
+			/* err := */ OnCreatedUser(CreatedUserEvent{Header: header, Data: user}, snapshot.UserById, snapshot.UserIdByEmail)
 		}
 		snapshot.LastEventDt = header.CreatedAt
 		return true

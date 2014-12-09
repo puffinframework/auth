@@ -3,6 +3,8 @@ package auth
 import (
 	"errors"
 	"github.com/puffinframework/event"
+	"github.com/puffinframework/snapshot"
+	"time"
 )
 
 var (
@@ -43,4 +45,52 @@ func OnCreatedUser(evt CreatedUserEvent, appIdByEmail AppIdByEmail, usersById Us
 	appIdByEmail[user.Email] = user.AppId
 	usersById[user.Id] = user
 	return nil
+}
+
+type Auth interface {
+	CreateUser(appId string, email string, password string) error
+}
+
+type authImpl struct {
+	es event.Store
+	ss snapshot.Store
+}
+
+type authSnapshot struct {
+	LastEventDt  time.Time
+	AppIdByEmail AppIdByEmail
+	UsersById    UsersById
+}
+
+func NewAuth(es event.Store, ss snapshot.Store) Auth {
+	return &authImpl{es: es, ss: ss}
+}
+
+func (self *authImpl) CreateUser(appId string, email string, password string) error {
+	snapshot := &authSnapshot{}
+	self.ss.MustLoadSnapshot("AuthSnapshot", snapshot)
+
+	evt, err := CreateUser(appId, email, password, snapshot.AppIdByEmail)
+	if err != nil {
+		return err
+	}
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
+}
+
+func (self *authImpl) ProcessEvents() {
+	snapshot := &authSnapshot{}
+	self.ss.MustLoadSnapshot("AuthSnapshot", snapshot)
+	self.es.ForEachEventHeader(snapshot.LastEventDt, func(header event.Header) bool {
+		switch header.Type {
+		case "CreatedUser":
+			user := User{}
+			self.es.MustLoadEventData(header, &user)
+			/* err := */ OnCreatedUser(CreatedUserEvent{Header: header, Data: user}, snapshot.AppIdByEmail, snapshot.UsersById)
+		}
+		snapshot.LastEventDt = header.CreatedAt
+		return true
+	})
+	self.ss.MustSaveSnapshot("AuthSnapshot", snapshot)
 }

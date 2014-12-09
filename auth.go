@@ -13,26 +13,22 @@ var (
 )
 
 type User struct {
-	AppId      string
-	Id         string
-	Email      string
-	Hash       string
-	HashedPass string
+	Id    string
+	AppId string
+	Email string
 }
 
 type UserById map[string]User
 
-type UserIdByEmail map[string]string
+type AppIdByEmail map[string]string
 
 type CreatedUserEvent struct {
 	Header event.Header
 	Data   User
 }
 
-func CreateUser(appId string, email string, password string, userById UserById, userIdByEmail UserIdByEmail) (CreatedUserEvent, error) {
-	otherId := userIdByEmail[email]
-	otherUser := userById[otherId]
-	if otherUser.AppId == appId {
+func CreateUser(appId string, email string, password string, appIdByEmail AppIdByEmail) (CreatedUserEvent, error) {
+	if appIdByEmail[email] == appId {
 		return CreatedUserEvent{}, ErrEmailUsed
 	}
 
@@ -43,10 +39,15 @@ func CreateUser(appId string, email string, password string, userById UserById, 
 	return evt, nil
 }
 
-func OnCreatedUser(evt CreatedUserEvent, userById UserById, userIdByEmail UserIdByEmail) error {
+func OnCreatedUser(evt CreatedUserEvent, userById UserById) error {
 	user := evt.Data
 	userById[user.Id] = user
-	userIdByEmail[user.Email] = user.Id
+	return nil
+}
+
+func OnCreatedUserUpdateAppIdByEmail(evt CreatedUserEvent, appIdByEmail AppIdByEmail) error {
+	user := evt.Data
+	appIdByEmail[user.Email] = user.AppId
 	return nil
 }
 
@@ -60,9 +61,9 @@ type authImpl struct {
 }
 
 type authSnapshot struct {
-	LastEventDt   time.Time
-	UserIdByEmail UserIdByEmail
-	UserById     UserById
+	LastEventDt  time.Time
+	AppIdByEmail AppIdByEmail
+	//UserById     UserById
 }
 
 func NewAuth(es event.Store, ss snapshot.Store) Auth {
@@ -73,7 +74,7 @@ func (self *authImpl) CreateUser(appId string, email string, password string) er
 	snapshot := &authSnapshot{}
 	self.ss.MustLoadSnapshot("AuthSnapshot", snapshot)
 
-	evt, err := CreateUser(appId, email, password, snapshot.UserById, snapshot.UserIdByEmail)
+	evt, err := CreateUser(appId, email, password, snapshot.AppIdByEmail)
 	if err != nil {
 		return err
 	}
@@ -90,10 +91,14 @@ func (self *authImpl) ProcessEvents() {
 		case "CreatedUser":
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
-			/* err := */ OnCreatedUser(CreatedUserEvent{Header: header, Data: user}, snapshot.UserById, snapshot.UserIdByEmail)
+			evt := CreatedUserEvent{Header: header, Data: user}
+			// err := OnCreatedUser(evt, snapshot.UserById)
+			/* err := */ OnCreatedUserUpdateAppIdByEmail(evt, snapshot.AppIdByEmail)
+
 		}
 		snapshot.LastEventDt = header.CreatedAt
 		return true
 	})
+
 	self.ss.MustSaveSnapshot("AuthSnapshot", snapshot)
 }

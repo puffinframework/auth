@@ -21,15 +21,15 @@ type User struct {
 
 type UsersById map[string]User
 
-type AppIdByEmail map[string]string
+type UserIdByEmail map[string]string
 
 type CreatedUserEvent struct {
 	Header event.Header
 	Data   User
 }
 
-func CreateUser(appId string, email string, password string, appIdByEmail AppIdByEmail) (CreatedUserEvent, error) {
-	if appIdByEmail[email] == appId {
+func CreateUser(appId string, email string, password string, userIdByEmail UserIdByEmail) (CreatedUserEvent, error) {
+	if userIdByEmail[email] == appId {
 		return CreatedUserEvent{}, ErrEmailUsed
 	}
 
@@ -40,9 +40,9 @@ func CreateUser(appId string, email string, password string, appIdByEmail AppIdB
 	return evt, nil
 }
 
-func OnCreatedUser(evt CreatedUserEvent, appIdByEmail AppIdByEmail, usersById UsersById) error {
+func OnCreatedUser(evt CreatedUserEvent, userIdByEmail UserIdByEmail, usersById UsersById) error {
 	user := evt.Data
-	appIdByEmail[user.Email] = user.AppId
+	userIdByEmail[user.Email] = user.AppId
 	usersById[user.Id] = user
 	return nil
 }
@@ -58,7 +58,7 @@ type authImpl struct {
 
 type authSnapshot struct {
 	LastEventDt  time.Time
-	AppIdByEmail AppIdByEmail
+	UserIdByEmail UserIdByEmail
 	UsersById    UsersById
 }
 
@@ -70,7 +70,7 @@ func (self *authImpl) CreateUser(appId string, email string, password string) er
 	snapshot := &authSnapshot{}
 	self.ss.MustLoadSnapshot("AuthSnapshot", snapshot)
 
-	evt, err := CreateUser(appId, email, password, snapshot.AppIdByEmail)
+	evt, err := CreateUser(appId, email, password, snapshot.UserIdByEmail)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (self *authImpl) ProcessEvents() {
 		case "CreatedUser":
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
-			/* err := */ OnCreatedUser(CreatedUserEvent{Header: header, Data: user}, snapshot.AppIdByEmail, snapshot.UsersById)
+			/* err := */ OnCreatedUser(CreatedUserEvent{Header: header, Data: user}, snapshot.UserIdByEmail, snapshot.UsersById)
 		}
 		snapshot.LastEventDt = header.CreatedAt
 		return true

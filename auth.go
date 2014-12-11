@@ -86,7 +86,7 @@ func (self *authImpl) CreateUser(appId string, email string, password string) er
 func (self *authImpl) ProcessEvents() {
 	snapshot := &authSnapshot{}
 	self.ss.MustLoadSnapshot("AuthSnapshot", snapshot)
-	self.es.ForEachEventHeader(snapshot.LastEventDt, func(header event.Header) bool {
+	self.es.ForEachEventHeader(snapshot.LastEventDt, func(header event.Header) (bool, error) {
 		switch header.Type {
 		case "CreatedUser":
 			user := User{}
@@ -97,7 +97,7 @@ func (self *authImpl) ProcessEvents() {
 
 		}
 		snapshot.LastEventDt = header.CreatedAt
-		return true
+		return true, nil
 	})
 
 	self.ss.MustSaveSnapshot("AuthSnapshot", snapshot)

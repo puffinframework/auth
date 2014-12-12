@@ -92,8 +92,9 @@ func (self *authImpl) ProcessEvents() {
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
 			evt := CreatedUserEvent{Header: header, Data: user}
-			// err := OnCreatedUser(evt, snapshot.UserById)
-			/* err := */ OnCreatedUserUpdateAppIdByEmail(evt, snapshot.AppIdByEmail)
+			if err := OnCreatedUserUpdateAppIdByEmail(evt, snapshot.AppIdByEmail); err != nil {
+				return false, err
+			}
 
 		}
 		snapshot.LastEventDt = header.CreatedAt

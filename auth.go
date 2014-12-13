@@ -18,8 +18,6 @@ type User struct {
 	Email string
 }
 
-type UserById map[string]User
-
 type AppIdByEmail map[string]string
 
 type CreatedUserEvent struct {
@@ -39,13 +37,7 @@ func CreateUser(appId string, email string, password string, appIdByEmail AppIdB
 	return evt, nil
 }
 
-func OnCreatedUser(evt CreatedUserEvent, userById UserById) error {
-	user := evt.Data
-	userById[user.Id] = user
-	return nil
-}
-
-func OnCreatedUserUpdateAppIdByEmail(evt CreatedUserEvent, appIdByEmail AppIdByEmail) error {
+func OnCreatedUser(evt CreatedUserEvent, appIdByEmail AppIdByEmail) error {
 	user := evt.Data
 	appIdByEmail[user.Email] = user.AppId
 	return nil
@@ -63,7 +55,6 @@ type authImpl struct {
 type authSnapshot struct {
 	LastEventDt  time.Time
 	AppIdByEmail AppIdByEmail
-	//UserById     UserById
 }
 
 func NewAuth(es event.Store, ss snapshot.Store) Auth {
@@ -92,10 +83,9 @@ func (self *authImpl) ProcessEvents() {
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
 			evt := CreatedUserEvent{Header: header, Data: user}
-			if err := OnCreatedUserUpdateAppIdByEmail(evt, snapshot.AppIdByEmail); err != nil {
+			if err := OnCreatedUser(evt, snapshot.AppIdByEmail); err != nil {
 				return false, err
 			}
-
 		}
 		snapshot.LastEventDt = header.CreatedAt
 		return true, nil

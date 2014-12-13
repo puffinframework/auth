@@ -46,7 +46,7 @@ func (self *authImpl) processEvents() *snapshotData {
 
 	self.es.ForEachEventHeader(data.LastEventDt, func(header event.Header) (bool, error) {
 		switch header.Type {
-		case "CreatedUser":
+		case CREATED_USER:
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
 			evt := CreatedUserEvent{Header: header, Data: user}

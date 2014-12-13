@@ -5,6 +5,10 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+const (
+	CREATED_USER string = "CreatedUser"
+)
+
 type User struct {
 	Id    string
 	AppId string
@@ -24,7 +28,7 @@ func CreateUser(appId string, email string, password string, appIdByEmail AppIdB
 	}
 
 	evt := CreatedUserEvent{
-		Header: event.NewHeader("CreatedUser", 1),
+		Header: event.NewHeader(CREATED_USER, 1),
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email},
 	}
 	return evt, nil

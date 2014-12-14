@@ -1,8 +1,11 @@
 package auth_test
 
 import (
-	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
+
+	"github.com/puffinframework/config"
+	"github.com/stretchr/testify/assert"
 )
 
 type authConfig struct {
@@ -15,5 +18,9 @@ type authConfig struct {
 }
 
 func Test(t *testing.T) {
-	assert.Nil(t, nil)
+	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
+
+	cfg := &authConfig{}
+	config.MustReadConfig(cfg)
+	assert.NotNil(t, cfg)
 }

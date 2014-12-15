@@ -24,5 +24,5 @@ func Test(t *testing.T) {
 	assert.NotNil(t, authService)
 
 	assert.Nil(t, authService.CreateUser("testApp", "test@test.com", "123qweasd"))
-	assert.NotNil(t, authService.CreateUser("testApp", "test@test.com", "123qweasd"))
+	assert.Equal(t, auth.ErrEmailAlreadyUsed, authService.CreateUser("testApp", "test@test.com", "123qweasd"))
 }

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	CREATED_USER string = "CreatedUser"
+	SIGNED_UP string = "SignedUp"
 )
 
 type User struct {
@@ -17,24 +17,24 @@ type User struct {
 
 type AppIdByEmail map[string]string
 
-type CreatedUserEvent struct {
+type SignedUpEvent struct {
 	Header event.Header
 	Data   User
 }
 
-func CreateUser(appId string, email string, password string, appIdByEmail AppIdByEmail) (CreatedUserEvent, error) {
+func SignUp(appId string, email string, password string, appIdByEmail AppIdByEmail) (SignedUpEvent, error) {
 	if appIdByEmail[email] == appId {
-		return CreatedUserEvent{}, ErrEmailAlreadyUsed
+		return SignedUpEvent{}, ErrEmailAlreadyUsed
 	}
 
-	evt := CreatedUserEvent{
-		Header: event.NewHeader(CREATED_USER, 1),
+	evt := SignedUpEvent{
+		Header: event.NewHeader(SIGNED_UP, 1),
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email},
 	}
 	return evt, nil
 }
 
-func OnCreatedUser(evt CreatedUserEvent, appIdByEmail AppIdByEmail) error {
+func OnSignedUp(evt SignedUpEvent, appIdByEmail AppIdByEmail) error {
 	user := evt.Data
 	appIdByEmail[user.Email] = user.AppId
 	return nil

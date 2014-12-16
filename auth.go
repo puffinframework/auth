@@ -11,7 +11,7 @@ const (
 )
 
 type Auth interface {
-	CreateUser(appId string, email string, password string) error
+	SignUp(appId string, email string, password string) error
 }
 
 type authImpl struct {
@@ -28,10 +28,10 @@ func NewAuth(es event.Store, ss snapshot.Store) Auth {
 	return &authImpl{es: es, ss: ss}
 }
 
-func (self *authImpl) CreateUser(appId string, email string, password string) error {
+func (self *authImpl) SignUp(appId string, email string, password string) error {
 	data := self.processEvents()
 
-	evt, err := CreateUser(appId, email, password, data.AppIdByEmail)
+	evt, err := SignUp(appId, email, password, data.AppIdByEmail)
 	if err != nil {
 		return err
 	}
@@ -46,11 +46,11 @@ func (self *authImpl) processEvents() *snapshotData {
 
 	self.es.ForEachEventHeader(data.LastEventDt, func(header event.Header) (bool, error) {
 		switch header.Type {
-		case CREATED_USER:
+		case SIGNED_UP:
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
-			evt := CreatedUserEvent{Header: header, Data: user}
-			if err := OnCreatedUser(evt, data.AppIdByEmail); err != nil {
+			evt := SignedUpEvent{Header: header, Data: user}
+			if err := OnSignedUp(evt, data.AppIdByEmail); err != nil {
 				return false, err
 			}
 		}

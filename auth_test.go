@@ -23,6 +23,9 @@ func Test(t *testing.T) {
 	authService := auth.NewAuth(eventStore, snapshotStore)
 	assert.NotNil(t, authService)
 
-	assert.Nil(t, authService.CreateUser("testApp", "test@test.com", "123qweasd"))
-	assert.Equal(t, auth.ErrEmailAlreadyUsed, authService.CreateUser("testApp", "test@test.com", "123qweasd"))
+	assert.Nil(t, authService.CreateUser("app1", "test@test.com", "123"))
+
+	assert.Equal(t, auth.ErrEmailAlreadyUsed, authService.CreateUser("app1", "test@test.com", "qwe"))
+
+	assert.Nil(t, authService.CreateUser("app2", "test@test.com", "asd"))
 }

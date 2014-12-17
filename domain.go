@@ -20,6 +20,14 @@ type User struct {
 
 type AppIdByEmail map[string]string
 
+type Password struct {
+	UserId string
+	Hashed string
+	Hash   string
+}
+
+type PasswordByEmail map[string]Password
+
 type Session struct {
 	Id        string
 	UserId    string

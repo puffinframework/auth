@@ -20,13 +20,13 @@ type User struct {
 
 type AppIdByEmail map[string]string
 
-type Password struct {
+type HashedPassword struct {
 	UserId string
-	Hashed string
+	Value  string
 	Hash   string
 }
 
-type PasswordByEmail map[string]Password
+type HashedPasswordByEmail map[string]HashedPassword
 
 type Session struct {
 	Id        string
@@ -64,12 +64,17 @@ func OnSignedUp(evt SignedUpEvent, appIdByEmail AppIdByEmail) error {
 	return nil
 }
 
-func SignIn(appId string, email string, password string, appIdByEmail AppIdByEmail) (SignedInEvent, error) {
+func SignIn(appId string, email string, password string, hpByEmail HashedPasswordByEmail) (SignedInEvent, error) {
 	// TODO
+	hp := hpByEmail[email]
+	hashedPassword := password
+	if hp.Value != hashedPassword {
+		return SignedInEvent{}, ErrSignInDenied
+	}
 
 	evt := SignedInEvent{
 		Header: event.NewHeader(SIGNED_UP, 1),
-		Data:   Session{},
+		Data:   Session{Id: uuid.NewV1().String()},
 	}
 	return evt, nil
 }

@@ -1,12 +1,15 @@
 package auth
 
 import (
+	"time"
+
 	"github.com/puffinframework/event"
 	"github.com/satori/go.uuid"
 )
 
 const (
 	SIGNED_UP string = "SignedUp"
+	SIGNED_IN string = "SignedIn"
 )
 
 type User struct {
@@ -17,9 +20,22 @@ type User struct {
 
 type AppIdByEmail map[string]string
 
+type Session struct {
+	Id        string
+	UserId    string
+	CreatedAt time.Time
+}
+
+type SessionById map[string]Session
+
 type SignedUpEvent struct {
 	Header event.Header
 	Data   User
+}
+
+type SignedInEvent struct {
+	Header event.Header
+	Data   Session
 }
 
 func SignUp(appId string, email string, password string, appIdByEmail AppIdByEmail) (SignedUpEvent, error) {

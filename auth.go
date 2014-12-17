@@ -12,6 +12,7 @@ const (
 
 type Auth interface {
 	SignUp(appId string, email string, password string) error
+	SignIn(appId string, email string, password string) (*Session, error)
 }
 
 type authImpl struct {
@@ -38,6 +39,11 @@ func (self *authImpl) SignUp(appId string, email string, password string) error 
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return nil
+}
+
+func (self *authImpl) SignIn(appId string, email string, password string) (*Session, error) {
+	// TODO
+	return &Session{}, nil
 }
 
 func (self *authImpl) processEvents() *snapshotData {

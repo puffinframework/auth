@@ -55,3 +55,13 @@ func OnSignedUp(evt SignedUpEvent, appIdByEmail AppIdByEmail) error {
 	appIdByEmail[user.Email] = user.AppId
 	return nil
 }
+
+func SignIn(appId string, email string, password string, appIdByEmail AppIdByEmail) (SignedInEvent, error) {
+	// TODO
+
+	evt := SignedInEvent{
+		Header: event.NewHeader(SIGNED_UP, 1),
+		Data:   Session{},
+	}
+	return evt, nil
+}

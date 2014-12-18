@@ -5,6 +5,7 @@ import (
 
 	"github.com/puffinframework/event"
 	"github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -22,8 +23,8 @@ type AppIdByEmail map[string]string
 
 type HashedPassword struct {
 	UserId string
-	Value  string
-	Hash   string
+	Value  []byte
+	Hash   []byte
 }
 
 type HashedPasswordByEmail map[string]HashedPassword
@@ -64,11 +65,11 @@ func OnSignedUp(evt SignedUpEvent, appIdByEmail AppIdByEmail) error {
 	return nil
 }
 
-func SignIn(appId string, email string, password string, hpByEmail HashedPasswordByEmail) (SignedInEvent, error) {
+func SignIn(appId string, email string, password string, hashedPasswordByEmail HashedPasswordByEmail) (SignedInEvent, error) {
 	// TODO
-	hp := hpByEmail[email]
-	hashedPassword := password
-	if hp.Value != hashedPassword {
+	hashedPassword := hashedPasswordByEmail[email]
+
+	if err := bcrypt.CompareHashAndPassword(hashedPassword.Value, []byte(password)); err != nil {
 		return SignedInEvent{}, ErrSignInDenied
 	}
 

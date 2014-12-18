@@ -66,7 +66,6 @@ func OnSignedUp(evt SignedUpEvent, appIdByEmail AppIdByEmail) error {
 }
 
 func SignIn(appId string, email string, password string, hashedPasswordByEmail HashedPasswordByEmail) (SignedInEvent, error) {
-	// TODO
 	hashedPassword := hashedPasswordByEmail[email]
 
 	if err := bcrypt.CompareHashAndPassword(hashedPassword.Value, []byte(password)); err != nil {

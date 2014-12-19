@@ -24,7 +24,6 @@ type AppIdByEmail map[string]string
 type HashedPassword struct {
 	UserId string
 	Value  []byte
-	Hash   []byte
 }
 
 type HashedPasswordByEmail map[string]HashedPassword

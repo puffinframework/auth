@@ -20,9 +20,7 @@ type User struct {
 	HashedPassword []byte
 }
 
-type AppIdByEmail map[string]string
-
-type HashedPasswordByEmail map[string][]byte
+type UserByEmail map[string]User
 
 type Session struct {
 	Id        string
@@ -42,8 +40,8 @@ type SignedInEvent struct {
 	Data   Session
 }
 
-func SignUp(appId string, email string, password string, appIdByEmail AppIdByEmail) (SignedUpEvent, error) {
-	if appIdByEmail[email] == appId {
+func SignUp(appId string, email string, password string, userByEmail UserByEmail) (SignedUpEvent, error) {
+	if userByEmail[email].AppId == appId {
 		return SignedUpEvent{}, ErrEmailAlreadyUsed
 	}
 
@@ -59,21 +57,21 @@ func SignUp(appId string, email string, password string, appIdByEmail AppIdByEma
 	return evt, nil
 }
 
-func OnSignedUp(evt SignedUpEvent, appIdByEmail AppIdByEmail, hashedPasswordByEmail HashedPasswordByEmail) error {
+func OnSignedUp(evt SignedUpEvent, userByEmail UserByEmail) error {
 	user := evt.Data
-	appIdByEmail[user.Email] = user.AppId
-	hashedPasswordByEmail[user.Email] = user.HashedPassword
+	userByEmail[user.Email] = user
 	return nil
 }
 
-func SignIn(appId string, email string, password string, hashedPasswordByEmail HashedPasswordByEmail) (SignedInEvent, error) {
-	if err := bcrypt.CompareHashAndPassword(hashedPasswordByEmail[email], []byte(password)); err != nil {
+func SignIn(appId string, email string, password string, userByEmail UserByEmail) (SignedInEvent, error) {
+	user := userByEmail[email]
+	if err := bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(password)); err != nil {
 		return SignedInEvent{}, ErrSignInDenied
 	}
 
 	evt := SignedInEvent{
 		Header: event.NewHeader(SIGNED_UP, 1),
-		Data:   Session{Id: uuid.NewV1().String()},
+		Data:   Session{Id: uuid.NewV1().String(), CreatedAt: time.Now(), UserId: user.Id},
 	}
 	return evt, nil
 }

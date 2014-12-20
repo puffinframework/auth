@@ -42,7 +42,14 @@ func (self *authImpl) SignUp(appId string, email string, password string) error 
 }
 
 func (self *authImpl) SignIn(appId string, email string, password string) (*Session, error) {
-	// TODO
+	data := self.processEvents()
+
+	evt, err := SignIn(appId, email, password, data.UserByEmail)
+	if err != nil {
+		return &Session{}, err
+	}
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return &Session{}, nil
 }
 

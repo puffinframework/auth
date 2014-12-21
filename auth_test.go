@@ -11,21 +11,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) {
+func TestSignUp(t *testing.T) {
 	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
-
 	eventStore := event.NewLeveldbStore()
 	defer eventStore.MustDestroy()
-
 	snapshotStore := snapshot.NewLeveldbStore()
 	defer snapshotStore.MustDestroy()
-
 	authService := auth.NewAuth(eventStore, snapshotStore)
-	assert.NotNil(t, authService)
 
 	assert.Nil(t, authService.SignUp("app1", "test@test.com", "123"))
-
 	assert.Equal(t, auth.ErrEmailAlreadyUsed, authService.SignUp("app1", "test@test.com", "qwe"))
-
 	assert.Nil(t, authService.SignUp("app2", "test@test.com", "asd"))
 }
+
+

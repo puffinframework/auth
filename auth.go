@@ -21,8 +21,9 @@ type authImpl struct {
 }
 
 type snapshotData struct {
-	LastEventDt time.Time
-	UserByEmail UserByEmail
+	LastEventDt   time.Time
+	UserById      UserById
+	UserIdByEmail UserIdByEmail
 }
 
 func NewAuth(es event.Store, ss snapshot.Store) Auth {
@@ -32,7 +33,7 @@ func NewAuth(es event.Store, ss snapshot.Store) Auth {
 func (self *authImpl) SignUp(appId string, email string, password string) error {
 	data := self.processEvents()
 
-	evt, err := SignUp(appId, email, password, data.UserByEmail)
+	evt, err := SignUp(appId, email, password, data.UserById, data.UserIdByEmail)
 	if err != nil {
 		return err
 	}
@@ -44,7 +45,7 @@ func (self *authImpl) SignUp(appId string, email string, password string) error 
 func (self *authImpl) SignIn(appId string, email string, password string) (*Session, error) {
 	data := self.processEvents()
 
-	evt, err := SignIn(appId, email, password, data.UserByEmail)
+	evt, err := SignIn(appId, email, password, data.UserById, data.UserIdByEmail)
 	if err != nil {
 		return &Session{}, err
 	}
@@ -63,7 +64,7 @@ func (self *authImpl) processEvents() *snapshotData {
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
 			evt := SignedUpEvent{Header: header, Data: user}
-			if err := OnSignedUp(evt, data.UserByEmail); err != nil {
+			if err := OnSignedUp(evt, data.UserById, data.UserIdByEmail); err != nil {
 				return false, err
 			}
 		}

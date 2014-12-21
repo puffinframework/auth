@@ -3,6 +3,7 @@ package auth_test
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/puffinframework/auth"
 	"github.com/puffinframework/config"
@@ -34,14 +35,18 @@ func TestSignIn(t *testing.T) {
 
 	session, err := authService.SignIn("app1", "user1@test.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
-	assert.Equal(t, "", session.Id)
 
 	assert.Nil(t, authService.SignUp("app1", "user1@test.com", "123"))
 
 	session, err = authService.SignIn("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
-	assert.Equal(t, "", session.Id)
 
+	t0 := time.Now()
 	session, err = authService.SignIn("app1", "user1@test.com", "123")
+	t1 := time.Now()
+
 	assert.Nil(t, err)
+	assert.NotEqual(t, "", session.Id)
+	assert.True(t, t0.Before(session.CreatedAt))
+	assert.True(t, t1.After(session.CreatedAt))
 }

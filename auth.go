@@ -51,7 +51,7 @@ func (self *authImpl) SignIn(appId string, email string, password string) (*Sess
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return &Session{}, nil
+	return &evt.Data, nil
 }
 
 func (self *authImpl) processEvents() *snapshotData {

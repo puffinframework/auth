@@ -24,4 +24,15 @@ func TestSignUp(t *testing.T) {
 	assert.Nil(t, authService.SignUp("app2", "test@test.com", "asd"))
 }
 
+func TestSignIn(t *testing.T) {
+	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
+	eventStore := event.NewLeveldbStore()
+	defer eventStore.MustDestroy()
+	snapshotStore := snapshot.NewLeveldbStore()
+	defer snapshotStore.MustDestroy()
+	authService := auth.NewAuth(eventStore, snapshotStore)
 
+	session, err := authService.SignIn("app1", "user1@test.com", "123")
+	assert.Equal(t, auth.ErrSignInDenied, err)
+	assert.Equal(t, "", session.Id)
+}

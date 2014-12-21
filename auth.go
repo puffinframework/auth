@@ -11,7 +11,7 @@ const (
 )
 
 type Auth interface {
-	SignUp(appId string, email string, password string) error
+	SignUp(appId string, email string, password string) (userId string, err error)
 	SignIn(appId string, email string, password string) (*Session, error)
 }
 
@@ -30,16 +30,17 @@ func NewAuth(es event.Store, ss snapshot.Store) Auth {
 	return &authImpl{es: es, ss: ss}
 }
 
-func (self *authImpl) SignUp(appId string, email string, password string) error {
+func (self *authImpl) SignUp(appId string, email string, password string) (userId string, err error) {
 	data := self.processEvents()
 
 	evt, err := SignUp(appId, email, password, data.UserById, data.UserIdByEmail)
 	if err != nil {
-		return err
+		return
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return nil
+	userId = evt.Data.Id
+	return
 }
 
 func (self *authImpl) SignIn(appId string, email string, password string) (*Session, error) {

@@ -20,9 +20,17 @@ func TestSignUp(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuth(eventStore, snapshotStore)
 
-	assert.Nil(t, authService.SignUp("app1", "user1@test.com", "123"))
-	assert.Equal(t, auth.ErrEmailAlreadyUsed, authService.SignUp("app1", "user1@test.com", "qwe"))
-	assert.Nil(t, authService.SignUp("app2", "user1@test.com", "asd"))
+	userId, err := authService.SignUp("app1", "user1@test.com", "123")
+	assert.Nil(t, err)
+	assert.NotEqual(t, "", userId)
+
+	userId, err = authService.SignUp("app1", "user1@test.com", "qwe")
+	assert.Equal(t, auth.ErrEmailAlreadyUsed, err)
+	assert.Equal(t, "", userId)
+
+	userId, err = authService.SignUp("app2", "user1@test.com", "asd")
+	assert.Nil(t, err)
+	assert.NotEqual(t, "", userId)
 }
 
 func TestSignIn(t *testing.T) {
@@ -36,7 +44,8 @@ func TestSignIn(t *testing.T) {
 	session, err := authService.SignIn("app1", "user1@test.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 
-	assert.Nil(t, authService.SignUp("app1", "user1@test.com", "123"))
+	userId, err := authService.SignUp("app1", "user1@test.com", "123")
+	assert.Nil(t, err)
 
 	session, err = authService.SignIn("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
@@ -49,4 +58,5 @@ func TestSignIn(t *testing.T) {
 	assert.NotEqual(t, "", session.Id)
 	assert.True(t, t0.Before(session.CreatedAt))
 	assert.True(t, t1.After(session.CreatedAt))
+	assert.Equal(t, userId, session.UserId)
 }

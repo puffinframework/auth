@@ -49,6 +49,8 @@ func TestSignIn(t *testing.T) {
 
 	session, err = authService.SignIn("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
+	assert.Equal(t, "", session.Id)
+	assert.Equal(t, "", session.UserId)
 
 	t0 := time.Now()
 	session, err = authService.SignIn("app1", "user1@test.com", "123")

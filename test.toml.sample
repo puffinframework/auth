@@ -3,3 +3,7 @@ LeveldbDir = "test-event-store"
 
 [SnapshotStore]
 LeveldbDir = "test-snapshot-store"
+
+[SmtpServer]
+User = ""
+Pass = ""

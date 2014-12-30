@@ -4,6 +4,8 @@ LeveldbDir = "test-event-store"
 [SnapshotStore]
 LeveldbDir = "test-snapshot-store"
 
-[SmtpServer]
-User = ""
-Pass = ""
+[SMTP]
+Server   = ""
+Port     = 0
+Login    = ""
+Password = ""

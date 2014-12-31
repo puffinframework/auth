@@ -13,6 +13,8 @@ const (
 type Auth interface {
 	SignUp(appId string, email string, password string) (userId string, err error)
 	SignIn(appId string, email string, password string) (*Session, error)
+	//ResetPassword(appId string, email string) (userId string, err error)
+	//ChangePassword(appId string, email string, oldPassword string, newPassword string) (*Session, error)
 }
 
 type authImpl struct {

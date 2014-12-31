@@ -12,7 +12,6 @@ const (
 
 type Auth interface {
 	SignUp(appId string, email string, password string) (userId string, err error)
-	ConfirmSignUp(appId string, email string, password string) (userId string, err error)
 	SignIn(appId string, email string, password string) (*Session, error)
 }
 
@@ -42,11 +41,6 @@ func (self *authImpl) SignUp(appId string, email string, password string) (userI
 	self.es.MustSaveEventData(evt.Header, evt.Data)
 	userId = evt.Data.Id
 	return
-}
-
-func (self *authImpl) ConfirmSignUp(appId string, email string, password string) (userId string, err error) {
-	// TODO
-	return "", nil
 }
 
 func (self *authImpl) SignIn(appId string, email string, password string) (*Session, error) {

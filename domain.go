@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"time"
-
 	"github.com/puffinframework/event"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -24,14 +22,6 @@ type UserById map[string]User
 
 type UserIdByEmail map[string]string
 
-type Session struct {
-	Id        string
-	UserId    string
-	CreatedAt time.Time
-}
-
-type SessionById map[string]Session
-
 type SignedUpEvent struct {
 	Header event.Header
 	Data   User
@@ -39,7 +29,9 @@ type SignedUpEvent struct {
 
 type SignedInEvent struct {
 	Header event.Header
-	Data   Session
+	Data struct {
+		JWT string
+	}
 }
 
 func SignUp(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedUpEvent, error) {
@@ -76,7 +68,7 @@ func SignIn(appId, email, password string, userById UserById, userIdByEmail User
 
 	evt := SignedInEvent{
 		Header: event.NewHeader(SIGNED_UP, 1),
-		Data:   Session{Id: uuid.NewV1().String(), CreatedAt: time.Now(), UserId: userId},
 	}
+	evt.Data.JWT = "jwt"
 	return evt, nil
 }

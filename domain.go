@@ -1,6 +1,10 @@
 package auth
 
 import (
+	"log"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
 	"github.com/puffinframework/event"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -9,6 +13,7 @@ import (
 const (
 	SIGNED_UP string = "SignedUp"
 	SIGNED_IN string = "SignedIn"
+	JWT_KEY   string = "developers Developers DEVELOPERS"
 )
 
 type User struct {
@@ -29,7 +34,7 @@ type SignedUpEvent struct {
 
 type SignedInEvent struct {
 	Header event.Header
-	Data struct {
+	Data   struct {
 		JWT string
 	}
 }
@@ -66,9 +71,18 @@ func SignIn(appId, email, password string, userById UserById, userIdByEmail User
 		return SignedInEvent{}, ErrSignInDenied
 	}
 
+	token := jwt.New(jwt.SigningMethodHS256)
+	token.Claims["userId"] = userId
+	token.Claims["createdAt"] = time.Now().Unix()
+	tokenString, err := token.SignedString([]byte(JWT_KEY))
+	log.Println(tokenString)
+	if err != nil {
+		log.Fatalln("[SignIn] couldn't create jwt", err)
+	}
+
 	evt := SignedInEvent{
 		Header: event.NewHeader(SIGNED_UP, 1),
 	}
-	evt.Data.JWT = "jwt"
+	evt.Data.JWT = tokenString
 	return evt, nil
 }

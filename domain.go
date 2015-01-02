@@ -42,7 +42,7 @@ type SignedInEvent struct {
 	Data   Session
 }
 
-func SignUp(appId string, email string, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedUpEvent, error) {
+func SignUp(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedUpEvent, error) {
 	userId := userIdByEmail[email]
 	if userById[userId].AppId == appId {
 		return SignedUpEvent{}, ErrEmailAlreadyUsed
@@ -67,7 +67,7 @@ func OnSignedUp(evt SignedUpEvent, userById UserById, userIdByEmail UserIdByEmai
 	return nil
 }
 
-func SignIn(appId string, email string, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedInEvent, error) {
+func SignIn(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedInEvent, error) {
 	userId := userIdByEmail[email]
 	user := userById[userId]
 	if err := bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(password)); err != nil {

@@ -11,10 +11,11 @@ const (
 )
 
 type Auth interface {
-	SignUp(appId string, email string, password string) (userId string, err error)
-	SignIn(appId string, email string, password string) (*Session, error)
-	//ChangePassword(appId string, email string, oldPassword string, newPassword string) error
-	//ResetPassword(appId string, email string) error
+	SignUp(appId, email, password string) (userId string, err error)
+	SignIn(appId, email, password string) (*Session, error)
+	//VerifyEmail(appId, email, verifyToken string) error
+	//ResetPassword(appId, email, resetToken string) error
+	//ChangePassword(appId, email, oldPassword, newPassword string) error
 }
 
 type authImpl struct {
@@ -32,7 +33,7 @@ func NewAuth(es event.Store, ss snapshot.Store) Auth {
 	return &authImpl{es: es, ss: ss}
 }
 
-func (self *authImpl) SignUp(appId string, email string, password string) (userId string, err error) {
+func (self *authImpl) SignUp(appId, email, password string) (userId string, err error) {
 	data := self.processEvents()
 
 	evt, err := SignUp(appId, email, password, data.UserById, data.UserIdByEmail)
@@ -45,7 +46,7 @@ func (self *authImpl) SignUp(appId string, email string, password string) (userI
 	return
 }
 
-func (self *authImpl) SignIn(appId string, email string, password string) (*Session, error) {
+func (self *authImpl) SignIn(appId, email, password string) (*Session, error) {
 	data := self.processEvents()
 
 	evt, err := SignIn(appId, email, password, data.UserById, data.UserIdByEmail)

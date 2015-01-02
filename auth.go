@@ -63,17 +63,16 @@ func (self *authImpl) processEvents() *snapshotData {
 	self.ss.MustLoadSnapshot(AUTH_SNAPSHOT, data)
 
 	self.es.ForEachEventHeader(data.LastEventDt, func(header event.Header) (bool, error) {
+		var err error
 		switch header.Type {
 		case SIGNED_UP:
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
 			evt := SignedUpEvent{Header: header, Data: user}
-			if err := OnSignedUp(evt, data.UserById, data.UserIdByEmail); err != nil {
-				return false, err
-			}
+			err = OnSignedUp(evt, data.UserById, data.UserIdByEmail)
 		}
 		data.LastEventDt = header.CreatedAt
-		return true, nil
+		return err != nil, err
 	})
 
 	self.ss.MustSaveSnapshot(AUTH_SNAPSHOT, data)

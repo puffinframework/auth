@@ -27,7 +27,7 @@ type UserById map[string]User
 
 type UserIdByEmail map[string]string
 
-type AuthToken struct {
+type Session struct {
 	UserId    string
 	CreatedAt time.Time
 }
@@ -39,7 +39,7 @@ type SignedUpEvent struct {
 
 type SignedInEvent struct {
 	Header event.Header
-	Data   AuthToken
+	Data   Session
 }
 
 func SignUp(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedUpEvent, error) {
@@ -76,15 +76,15 @@ func SignIn(appId, email, password string, userById UserById, userIdByEmail User
 
 	evt := SignedInEvent{
 		Header: event.NewHeader(SIGNED_UP, 1),
-		Data:   AuthToken{UserId: userId, CreatedAt: time.Now()},
+		Data:   Session{UserId: userId, CreatedAt: time.Now()},
 	}
 	return evt, nil
 }
 
-func CreateJWT(authToken AuthToken) string {
+func CreateJWT(session Session) string {
 	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["userId"] = authToken.UserId
-	token.Claims["createdAt"] = authToken.CreatedAt.Unix()
+	token.Claims["userId"] = session.UserId
+	token.Claims["createdAt"] = session.CreatedAt.Unix()
 	tokenStr, err := token.SignedString([]byte(JWT_KEY))
 	if err != nil {
 		log.Fatalln("[SignIn] couldn't create jwt", err)
@@ -92,18 +92,18 @@ func CreateJWT(authToken AuthToken) string {
 	return tokenStr
 }
 
-func ParseJWT(tokenStr string) (AuthToken, error) {
+func ParseJWT(tokenStr string) (Session, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		return []byte(JWT_KEY), nil
 	})
 	if err != nil {
-		return AuthToken{}, err
+		return Session{}, err
 	}
 	if !token.Valid {
-		return AuthToken{}, ErrAuthTokenNotValid
+		return Session{}, ErrSessionNotValid
 	}
 
 	userId := token.Claims["userId"].(string)
 	createdAt := time.Unix(int64(token.Claims["createdAt"].(float64)), 0)
-	return AuthToken{UserId: userId, CreatedAt: createdAt}, nil
+	return Session{UserId: userId, CreatedAt: createdAt}, nil
 }

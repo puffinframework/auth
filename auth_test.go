@@ -55,26 +55,26 @@ func TestSignIn(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", tokenStr)
 
-	authToken, err := auth.ParseJWT(tokenStr)
+	session, err := auth.ParseJWT(tokenStr)
 	assert.Nil(t, err)
-	assert.Equal(t, userId, authToken.UserId)
+	assert.Equal(t, userId, session.UserId)
 
 	now := time.Now()
 	t0 := now.Add(-1 * time.Minute)
 	t1 := now.Add(1 * time.Minute)
 
-	assert.True(t, t0.Before(authToken.CreatedAt))
-	assert.True(t, t1.After(authToken.CreatedAt))
+	assert.True(t, t0.Before(session.CreatedAt))
+	assert.True(t, t1.After(session.CreatedAt))
 }
 
 func TestJWT(t *testing.T) {
 	userId := "user-1"
 	createdAt := time.Unix(123, 0)
 
-	tokenStr := auth.CreateJWT(auth.AuthToken{UserId: userId, CreatedAt: createdAt})
+	tokenStr := auth.CreateJWT(auth.Session{UserId: userId, CreatedAt: createdAt})
 
-	authToken, err := auth.ParseJWT(tokenStr)
+	session, err := auth.ParseJWT(tokenStr)
 	assert.Nil(t, err)
-	assert.Equal(t, userId, authToken.UserId)
-	assert.Equal(t, createdAt, authToken.CreatedAt)
+	assert.Equal(t, userId, session.UserId)
+	assert.Equal(t, createdAt, session.CreatedAt)
 }

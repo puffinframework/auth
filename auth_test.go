@@ -41,21 +41,21 @@ func TestSignIn(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuth(eventStore, snapshotStore)
 
-	tokenStr, err := authService.SignIn("app1", "user1@test.com", "123")
+	sessionToken, err := authService.SignIn("app1", "user1@test.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 
 	userId, err := authService.SignUp("app1", "user1@test.com", "123")
 	assert.Nil(t, err)
 
-	tokenStr, err = authService.SignIn("app1", "user1@test.com", "qwe")
+	sessionToken, err = authService.SignIn("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
-	assert.Equal(t, "", tokenStr)
+	assert.Equal(t, "", sessionToken)
 
-	tokenStr, err = authService.SignIn("app1", "user1@test.com", "123")
+	sessionToken, err = authService.SignIn("app1", "user1@test.com", "123")
 	assert.Nil(t, err)
-	assert.NotEqual(t, "", tokenStr)
+	assert.NotEqual(t, "", sessionToken)
 
-	session, err := auth.DecodeSession(tokenStr)
+	session, err := auth.DecodeSession(sessionToken)
 	assert.Nil(t, err)
 	assert.Equal(t, userId, session.UserId)
 

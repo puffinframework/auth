@@ -8,23 +8,23 @@ import (
 )
 
 const (
-	JWT_KEY string = "developers Developers DEVELOPERS"
+	jwtkey string = "developers Developers DEVELOPERS"
 )
 
 func EncodeSession(session Session) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims["userId"] = session.UserId
 	token.Claims["createdAt"] = session.CreatedAt.Unix()
-	tokenStr, err := token.SignedString([]byte(JWT_KEY))
+	sessionToken, err := token.SignedString([]byte(jwtkey))
 	if err != nil {
 		log.Fatalln("[SignIn] couldn't create jwt", err)
 	}
-	return tokenStr
+	return sessionToken
 }
 
-func DecodeSession(tokenStr string) (Session, error) {
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte(JWT_KEY), nil
+func DecodeSession(sessionToken string) (Session, error) {
+	token, err := jwt.Parse(sessionToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtkey), nil
 	})
 	if err != nil {
 		return Session{}, err

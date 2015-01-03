@@ -12,9 +12,9 @@ func TestJWT(t *testing.T) {
 	userId := "user-1"
 	createdAt := time.Unix(123, 0)
 
-	tokenStr := auth.EncodeSession(auth.Session{UserId: userId, CreatedAt: createdAt})
+	sessionToken := auth.EncodeSession(auth.Session{UserId: userId, CreatedAt: createdAt})
 
-	session, err := auth.DecodeSession(tokenStr)
+	session, err := auth.DecodeSession(sessionToken)
 	assert.Nil(t, err)
 	assert.Equal(t, userId, session.UserId)
 	assert.Equal(t, createdAt, session.CreatedAt)

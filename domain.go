@@ -71,18 +71,28 @@ func SignIn(appId, email, password string, userById UserById, userIdByEmail User
 		return SignedInEvent{}, ErrSignInDenied
 	}
 
-	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["userId"] = userId
-	token.Claims["createdAt"] = time.Now().Unix()
-	tokenString, err := token.SignedString([]byte(JWT_KEY))
-	log.Println(tokenString)
-	if err != nil {
-		log.Fatalln("[SignIn] couldn't create jwt", err)
-	}
-
 	evt := SignedInEvent{
 		Header: event.NewHeader(SIGNED_UP, 1),
 	}
-	evt.Data.JWT = tokenString
+	evt.Data.JWT = CreateJWT(userId)
+
 	return evt, nil
+}
+
+func CreateJWT(userId string) string {
+	token := jwt.New(jwt.SigningMethodHS256)
+	token.Claims["userId"] = userId
+	token.Claims["createdAt"] = time.Now().Unix()
+	tokenStr, err := token.SignedString([]byte(JWT_KEY))
+	log.Println(tokenStr)
+	if err != nil {
+		log.Fatalln("[SignIn] couldn't create jwt", err)
+	}
+	return tokenStr
+}
+
+func ParseJWT(tokenStr string) (*jwt.Token, error) {
+	return jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		return []byte(JWT_KEY), nil
+	})
 }

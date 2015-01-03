@@ -12,7 +12,7 @@ const (
 
 type Auth interface {
 	SignUp(appId, email, password string) (userId string, err error)
-	SignIn(appId, email, password string) (jwt string, err error)
+	SignIn(appId, email, password string) (token string, err error)
 	//VerifyEmail(appId, email, verifyToken string) error
 	//ResetPassword(appId, email, resetToken string) error
 	//ChangePassword(appId, email, oldPassword, newPassword string) error
@@ -46,12 +46,12 @@ func (self *authImpl) SignUp(appId, email, password string) (userId string, err 
 	return
 }
 
-func (self *authImpl) SignIn(appId, email, password string) (jwt string, err error) {
+func (self *authImpl) SignIn(appId, email, password string) (token string, err error) {
 	data := self.processEvents()
 
 	evt, err := SignIn(appId, email, password, data.UserById, data.UserIdByEmail)
 	if err != nil {
-		return jwt, err
+		return token, err
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)

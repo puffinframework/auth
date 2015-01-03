@@ -41,30 +41,36 @@ func TestSignIn(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuth(eventStore, snapshotStore)
 
-	jwt, err := authService.SignIn("app1", "user1@test.com", "123")
+	tokenStr, err := authService.SignIn("app1", "user1@test.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 
-	/*userId*/_, err = authService.SignUp("app1", "user1@test.com", "123")
+	userId, err := authService.SignUp("app1", "user1@test.com", "123")
 	assert.Nil(t, err)
 
-	jwt, err = authService.SignIn("app1", "user1@test.com", "qwe")
+	tokenStr, err = authService.SignIn("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
-	/*
-	assert.Equal(t, "", jwt.Id)
-	assert.Equal(t, "", jwt.UserId)
-	*/
-	assert.Equal(t, "", jwt)
+	assert.Equal(t, "", tokenStr)
 
 	//t0 := time.Now()
-	jwt, err = authService.SignIn("app1", "user1@test.com", "123")
+	tokenStr, err = authService.SignIn("app1", "user1@test.com", "123")
 	//t1 := time.Now()
 
 	assert.Nil(t, err)
-	/*
-	assert.NotEqual(t, "", jwt.Id)
-	assert.True(t, t0.Before(jwt.CreatedAt))
-	assert.True(t, t1.After(jwt.CreatedAt))
-	assert.Equal(t, userId, jwt.UserId)
-	*/
-	assert.NotEqual(t, "", jwt)
+	assert.NotEqual(t, "", tokenStr)
+
+	token, err := auth.ParseJWT(tokenStr)
+	assert.Nil(t, err)
+	assert.True(t, token.Valid)
+
+	//assert.True(t, t0.Before(jwt.CreatedAt))
+	//assert.True(t, t1.After(jwt.CreatedAt))
+	assert.Equal(t, userId, token.Claims["userId"])
+}
+
+func TestJWT(t *testing.T) {
+	tokenStr := auth.CreateJWT("user-1")
+	token, err := auth.ParseJWT(tokenStr)
+	assert.Nil(t, err)
+	assert.True(t, token.Valid)
+	assert.Equal(t, "user-1", token.Claims["userId"])
 }

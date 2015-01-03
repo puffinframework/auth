@@ -5,6 +5,7 @@ import (
 )
 
 var (
-	ErrEmailAlreadyUsed error = errors.New("auth: the email is already being used")
-	ErrSignInDenied     error = errors.New("auth: sign in denied")
+	ErrEmailAlreadyUsed  error = errors.New("auth: the email is already being used")
+	ErrSignInDenied      error = errors.New("auth: sign in denied")
+	ErrAuthTokenNotValid error = errors.New("auth: AuthToken is not valid")
 )

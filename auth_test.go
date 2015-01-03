@@ -51,27 +51,30 @@ func TestSignIn(t *testing.T) {
 	assert.Equal(t, auth.ErrSignInDenied, err)
 	assert.Equal(t, "", tokenStr)
 
-	t0 := time.Now().Unix()
 	tokenStr, err = authService.SignIn("app1", "user1@test.com", "123")
-	t1 := time.Now().Unix()
-
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", tokenStr)
 
-	token, err := auth.ParseJWT(tokenStr)
+	authToken, err := auth.ParseJWT(tokenStr)
 	assert.Nil(t, err)
-	assert.True(t, token.Valid)
-	assert.Equal(t, userId, token.Claims["userId"])
+	assert.Equal(t, userId, authToken.UserId)
 
-	createdAt := int64(token.Claims["createdAt"].(float64))
-	assert.True(t, t0 <= createdAt)
-	assert.True(t, t1 >= createdAt)
+	now := time.Now()
+	t0 := now.Add(-1 * time.Minute)
+	t1 := now.Add(1 * time.Minute)
+
+	assert.True(t, t0.Before(authToken.CreatedAt))
+	assert.True(t, t1.After(authToken.CreatedAt))
 }
 
 func TestJWT(t *testing.T) {
-	tokenStr := auth.CreateJWT("user-1")
-	token, err := auth.ParseJWT(tokenStr)
+	userId := "user-1"
+	createdAt := time.Unix(123, 0)
+
+	tokenStr := auth.CreateJWT(auth.AuthToken{UserId: userId, CreatedAt: createdAt})
+
+	authToken, err := auth.ParseJWT(tokenStr)
 	assert.Nil(t, err)
-	assert.True(t, token.Valid)
-	assert.Equal(t, "user-1", token.Claims["userId"])
+	assert.Equal(t, userId, authToken.UserId)
+	assert.Equal(t, createdAt, authToken.CreatedAt)
 }

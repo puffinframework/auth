@@ -84,7 +84,6 @@ func CreateJWT(userId string) string {
 	token.Claims["userId"] = userId
 	token.Claims["createdAt"] = time.Now().Unix()
 	tokenStr, err := token.SignedString([]byte(JWT_KEY))
-	log.Println(tokenStr)
 	if err != nil {
 		log.Fatalln("[SignIn] couldn't create jwt", err)
 	}

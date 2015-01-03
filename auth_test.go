@@ -3,7 +3,7 @@ package auth_test
 import (
 	"os"
 	"testing"
-	//"time"
+	"time"
 
 	"github.com/puffinframework/auth"
 	"github.com/puffinframework/config"
@@ -51,9 +51,9 @@ func TestSignIn(t *testing.T) {
 	assert.Equal(t, auth.ErrSignInDenied, err)
 	assert.Equal(t, "", tokenStr)
 
-	//t0 := time.Now()
+	t0 := time.Now().Unix()
 	tokenStr, err = authService.SignIn("app1", "user1@test.com", "123")
-	//t1 := time.Now()
+	t1 := time.Now().Unix()
 
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", tokenStr)
@@ -61,10 +61,11 @@ func TestSignIn(t *testing.T) {
 	token, err := auth.ParseJWT(tokenStr)
 	assert.Nil(t, err)
 	assert.True(t, token.Valid)
-
-	//assert.True(t, t0.Before(jwt.CreatedAt))
-	//assert.True(t, t1.After(jwt.CreatedAt))
 	assert.Equal(t, userId, token.Claims["userId"])
+
+	createdAt := int64(token.Claims["createdAt"].(float64))
+	assert.True(t, t0 <= createdAt)
+	assert.True(t, t1 >= createdAt)
 }
 
 func TestJWT(t *testing.T) {

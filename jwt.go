@@ -11,7 +11,7 @@ const (
 	JWT_KEY string = "developers Developers DEVELOPERS"
 )
 
-func CreateJWT(session Session) string {
+func EncodeSession(session Session) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims["userId"] = session.UserId
 	token.Claims["createdAt"] = session.CreatedAt.Unix()
@@ -22,7 +22,7 @@ func CreateJWT(session Session) string {
 	return tokenStr
 }
 
-func ParseJWT(tokenStr string) (Session, error) {
+func DecodeSession(tokenStr string) (Session, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		return []byte(JWT_KEY), nil
 	})

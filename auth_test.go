@@ -55,7 +55,7 @@ func TestSignIn(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", tokenStr)
 
-	session, err := auth.ParseJWT(tokenStr)
+	session, err := auth.DecodeSession(tokenStr)
 	assert.Nil(t, err)
 	assert.Equal(t, userId, session.UserId)
 

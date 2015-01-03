@@ -55,7 +55,7 @@ func (self *authImpl) SignIn(appId, email, password string) (token string, err e
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return CreateJWT(evt.Data), nil
+	return EncodeSession(evt.Data), nil
 }
 
 func (self *authImpl) processEvents() *snapshotData {

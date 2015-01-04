@@ -28,6 +28,13 @@ type Session struct {
 	UserId    string
 	CreatedAt time.Time
 }
+type Verification struct {
+	UserId string
+	AppId  string
+	Email  string
+}
+
+type VerificationByUserId map[string]Verification
 
 type SignedUpEvent struct {
 	Header event.Header

@@ -13,9 +13,9 @@ const (
 type Auth interface {
 	SignUp(appId, email, password string) (userId string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
-	//VerifyEmail(appId, email, verifyToken string) error
-	//ResetPassword(appId, email, resetToken string) error
-	//ChangePassword(appId, email, oldPassword, newPassword string) error
+	//VerifyEmail(verificationToken string) error
+	//ResetPassword(resetToken string) error
+	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
 
 type authImpl struct {

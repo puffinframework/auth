@@ -42,8 +42,7 @@ func (self *authImpl) SignUp(appId, email, password string) (userId string, err 
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	userId = evt.Data.Id
-	return
+	return evt.Data.Id, nil
 }
 
 func (self *authImpl) SignIn(appId, email, password string) (sessionToken string, err error) {

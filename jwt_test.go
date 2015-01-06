@@ -41,3 +41,17 @@ func TestSessionEncoding(t *testing.T) {
 	assert.Equal(t, userId, session.UserId)
 	assert.Equal(t, createdAt, session.CreatedAt)
 }
+
+func TestVerificationEncoding(t *testing.T) {
+	appId := "app-1"
+	userId := "user-1"
+	email := "user@app.com"
+
+	verificationToken := auth.EncodeVerification(auth.Verification{AppId: appId, Email: email, UserId: userId})
+
+	verification, err := auth.DecodeVerification(verificationToken)
+	assert.Nil(t, err)
+	assert.Equal(t, appId, verification.AppId)
+	assert.Equal(t, email, verification.Email)
+	assert.Equal(t, userId, verification.UserId)
+}

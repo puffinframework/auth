@@ -62,8 +62,8 @@ func DecodeVerification(verificationToken string) (Verification, error) {
 	}
 
 	verification := Verification{
-		AppId: token.Claims["appId"].(string),
-		Email: token.Claims["email"].(string),
+		AppId:  token.Claims["appId"].(string),
+		Email:  token.Claims["email"].(string),
 		UserId: token.Claims["userId"].(string),
 	}
 	return verification, nil

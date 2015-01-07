@@ -41,11 +41,18 @@ func TestSignIn(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuth(eventStore, snapshotStore)
 
+	// try to sign in without having signed up
 	sessionToken, err := authService.SignIn("app1", "user1@test.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 
+	// sign up
 	userId, err := authService.SignUp("app1", "user1@test.com", "123")
 	assert.Nil(t, err)
+
+	// try to sign in without having verified the email
+	sessionToken, err = authService.SignIn("app1", "user1@test.com", "123")
+	assert.Equal(t, auth.ErrEmailNotVerified, err)
+	assert.Equal(t, "", sessionToken)
 
 	sessionToken, err = authService.SignIn("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)

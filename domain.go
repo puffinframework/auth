@@ -71,7 +71,7 @@ func OnSignedUp(evt SignedUpEvent, userById UserById, userIdByEmail UserIdByEmai
 	return nil
 }
 
-func SignIn(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedInEvent, error) {
+func SignIn(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail, verificationByUserId VerificationByUserId) (SignedInEvent, error) {
 	userId := userIdByEmail[email]
 	user := userById[userId]
 	if err := bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(password)); err != nil {

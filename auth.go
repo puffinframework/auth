@@ -13,7 +13,7 @@ const (
 type Auth interface {
 	SignUp(appId, email, password string) (userId string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
-	//VerifyEmail(verificationToken string) error
+	VerifyEmail(appId, email, userId string) error
 	//ResetPassword(resetToken string) error
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
@@ -58,6 +58,18 @@ func (self *authImpl) SignIn(appId, email, password string) (sessionToken string
 	return EncodeSession(evt.Data), nil
 }
 
+func (self *authImpl) VerifyEmail(appId, email, userId string) error {
+	data := self.processEvents()
+
+	evt, err := VerifyEmail(appId, email, userId, data.UserIdByEmail)
+	if err != nil {
+		return err
+	}
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
+}
+
 func (self *authImpl) processEvents() *snapshotData {
 	data := &snapshotData{}
 	self.ss.MustLoadSnapshot(AUTH_SNAPSHOT, data)
@@ -70,6 +82,11 @@ func (self *authImpl) processEvents() *snapshotData {
 			self.es.MustLoadEventData(header, &user)
 			evt := SignedUpEvent{Header: header, Data: user}
 			err = OnSignedUp(evt, data.UserById, data.UserIdByEmail)
+		case VERIFIED_EMAIL:
+			verification := Verification{}
+			self.es.MustLoadEventData(header, &verification)
+			evt := VerifiedEmailEvent{Header: header, Data: verification}
+			err = OnVerifiedEmail(evt, data.VerificationByUserId)
 		}
 		data.LastEventDt = header.CreatedAt
 		return err != nil, err

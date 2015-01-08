@@ -54,10 +54,20 @@ func TestSignIn(t *testing.T) {
 	assert.Equal(t, auth.ErrEmailNotVerified, err)
 	assert.Equal(t, "", sessionToken)
 
+	// verify email with the wrong user
+	err = authService.VerifyEmail("app1", "user832@test.com", userId)
+	assert.Equal(t, auth.ErrVerificationDenied, err)
+
+	// verify email
+	err = authService.VerifyEmail("app1", "user1@test.com", userId)
+	assert.Nil(t, nil)
+
+	// try to sign in with the wrong password
 	sessionToken, err = authService.SignIn("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 	assert.Equal(t, "", sessionToken)
 
+	// sign in
 	sessionToken, err = authService.SignIn("app1", "user1@test.com", "123")
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", sessionToken)

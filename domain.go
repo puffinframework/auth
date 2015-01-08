@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	SIGNED_UP string = "SignedUp"
-	SIGNED_IN string = "SignedIn"
+	SIGNED_UP      string = "SignedUp"
+	SIGNED_IN      string = "SignedIn"
+	VERIFIED_EMAIL string = "VerifiedEmail"
 )
 
 type User struct {
@@ -46,6 +47,11 @@ type SignedInEvent struct {
 	Data   Session
 }
 
+type VerifiedEmailEvent struct {
+	Header event.Header
+	Data   Verification
+}
+
 func SignUp(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedUpEvent, error) {
 	userId := userIdByEmail[email]
 	if userById[userId].AppId == appId {
@@ -68,6 +74,24 @@ func OnSignedUp(evt SignedUpEvent, userById UserById, userIdByEmail UserIdByEmai
 	user := evt.Data
 	userById[user.Id] = user
 	userIdByEmail[user.Email] = user.Id
+	return nil
+}
+
+func VerifyEmail(appId, email, userId string, userIdByEmail UserIdByEmail) (VerifiedEmailEvent, error) {
+	if userIdByEmail[email] != userId {
+		return VerifiedEmailEvent{}, ErrVerificationDenied
+	}
+
+	evt := VerifiedEmailEvent{
+		Header: event.NewHeader(VERIFIED_EMAIL, 1),
+		Data:   Verification{AppId: appId, Email: email, UserId: userId},
+	}
+	return evt, nil
+}
+
+func OnVerifiedEmail(evt VerifiedEmailEvent, verificationByUserId VerificationByUserId) error {
+	verification := evt.Data
+	verificationByUserId[verification.UserId] = verification
 	return nil
 }
 

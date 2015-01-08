@@ -46,18 +46,6 @@ func (self *authImpl) SignUp(appId, email, password string) (userId string, err 
 	return evt.Data.Id, nil
 }
 
-func (self *authImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
-	data := self.processEvents()
-
-	evt, err := SignIn(appId, email, password, data.UserById, data.UserIdByEmail, data.VerificationByUserId)
-	if err != nil {
-		return sessionToken, err
-	}
-
-	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return EncodeSession(evt.Data), nil
-}
-
 func (self *authImpl) VerifyEmail(appId, email, userId string) error {
 	data := self.processEvents()
 
@@ -68,6 +56,18 @@ func (self *authImpl) VerifyEmail(appId, email, userId string) error {
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return nil
+}
+
+func (self *authImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
+	data := self.processEvents()
+
+	evt, err := SignIn(appId, email, password, data.UserById, data.UserIdByEmail, data.VerificationByUserId)
+	if err != nil {
+		return sessionToken, err
+	}
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return EncodeSession(evt.Data), nil
 }
 
 func (self *authImpl) processEvents() *snapshotData {

@@ -1,9 +1,10 @@
 package auth
 
 import (
+	"time"
+
 	"github.com/puffinframework/event"
 	"github.com/puffinframework/snapshot"
-	"time"
 )
 
 const (
@@ -23,15 +24,15 @@ type authImpl struct {
 	ss snapshot.Store
 }
 
+func NewAuth(es event.Store, ss snapshot.Store) Auth {
+	return &authImpl{es: es, ss: ss}
+}
+
 type snapshotData struct {
 	LastEventDt          time.Time
 	UserById             UserById
 	UserIdByEmail        UserIdByEmail
 	VerificationByUserId VerificationByUserId
-}
-
-func NewAuth(es event.Store, ss snapshot.Store) Auth {
-	return &authImpl{es: es, ss: ss}
 }
 
 func (self *authImpl) SignUp(appId, email, password string) (userId string, err error) {
@@ -75,6 +76,7 @@ func (self *authImpl) processEvents() *snapshotData {
 	self.ss.MustLoadSnapshot(AUTH_SNAPSHOT, data)
 
 	self.es.ForEachEventHeader(data.LastEventDt, func(header event.Header) (bool, error) {
+		data.LastEventDt = header.CreatedAt
 		var err error
 		switch header.Type {
 		case SIGNED_UP:
@@ -88,8 +90,7 @@ func (self *authImpl) processEvents() *snapshotData {
 			evt := VerifiedEmailEvent{Header: header, Data: verification}
 			err = OnVerifiedEmail(evt, data.VerificationByUserId)
 		}
-		data.LastEventDt = header.CreatedAt
-		return err != nil, err
+		return err == nil, err
 	})
 
 	self.ss.MustSaveSnapshot(AUTH_SNAPSHOT, data)

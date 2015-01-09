@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"time"
-
 	"github.com/puffinframework/event"
 	"github.com/puffinframework/snapshot"
 )
@@ -26,13 +24,6 @@ type authImpl struct {
 
 func NewAuth(es event.Store, ss snapshot.Store) Auth {
 	return &authImpl{es: es, ss: ss}
-}
-
-type snapshotData struct {
-	LastEventDt          time.Time
-	UserById             UserById
-	UserIdByEmail        UserIdByEmail
-	VerificationByUserId VerificationByUserId
 }
 
 func (self *authImpl) SignUp(appId, email, password string) (userId string, err error) {

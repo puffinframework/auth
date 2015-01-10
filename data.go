@@ -28,7 +28,7 @@ type data struct {
 func NewSnapshotData(store snapshot.Store) SnapshotData {
 	return &impl{
 		store: store,
-		data: *data{
+		data: &data{
 			LastEventDt:          time.Unix(0, 0),
 			UserById:             make(map[string]User),
 			UserIdByEmail:        make(map[string]string),

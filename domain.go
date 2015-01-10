@@ -15,10 +15,6 @@ type User struct {
 	HashedPassword []byte
 }
 
-type UserById map[string]User
-
-type UserIdByEmail map[string]string
-
 type Session struct {
 	UserId    string
 	CreatedAt time.Time
@@ -29,7 +25,6 @@ type Verification struct {
 	Email  string
 }
 
-type VerificationByUserId map[string]Verification
 
 type SignedUpEvent struct {
 	Header event.Header

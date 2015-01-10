@@ -10,18 +10,18 @@ type SnapshotData interface {
 }
 
 type impl struct {
-	ss   *snapshot.Store
-	data *snapshotData
+	store *snapshot.Store
+	data  *data
 }
 
-type snapshotData struct {
+type data struct {
 	LastEventDt          time.Time
-	UserById             UserById
-	UserIdByEmail        UserIdByEmail
-	VerificationByUserId VerificationByUserId
+	UserById             map[string]User
+	UserIdByEmail        map[string]string
+	VerificationByUserId map[string]Verification
 }
 
-func NewSnapshotData(ss snapshot.Store) SnapshotData {
+func NewSnapshotData(store snapshot.Store) SnapshotData {
 	return nil
 }
 

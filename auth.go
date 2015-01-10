@@ -5,10 +5,6 @@ import (
 	"github.com/puffinframework/snapshot"
 )
 
-const (
-	AUTH_SNAPSHOT string = "AUTH_SNAPSHOT"
-)
-
 type Auth interface {
 	SignUp(appId, email, password string) (userId string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)

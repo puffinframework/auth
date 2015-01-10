@@ -23,8 +23,16 @@ type data struct {
 	VerificationByUserId map[string]Verification
 }
 
-func NewSnapshotData(store snapshot.Store) *SnapshotData {
-	return nil
+func NewSnapshotData(store *snapshot.Store) *SnapshotData {
+	return &impl{
+		store: store,
+		data: *data{
+			LastEventDt: 0,
+			UserById: make(map[string]User),
+			UserIdByEmail: make(map[string]string),
+			VerificationByUserId: make(map[string]Verification),
+		},
+	}
 }
 
 func (self *impl) Load() {

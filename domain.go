@@ -8,12 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const (
-	SIGNED_UP      string = "SignedUp"
-	SIGNED_IN      string = "SignedIn"
-	VERIFIED_EMAIL string = "VerifiedEmail"
-)
-
 type User struct {
 	Id             string
 	AppId          string
@@ -64,7 +58,7 @@ func SignUp(appId, email, password string, userById UserById, userIdByEmail User
 	}
 
 	evt := SignedUpEvent{
-		Header: event.NewHeader(SIGNED_UP, 1),
+		Header: event.NewHeader("SignedUp", 1),
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
 	}
 	return evt, nil
@@ -83,7 +77,7 @@ func VerifyEmail(appId, email, userId string, userIdByEmail UserIdByEmail) (Veri
 	}
 
 	evt := VerifiedEmailEvent{
-		Header: event.NewHeader(VERIFIED_EMAIL, 1),
+		Header: event.NewHeader("VerifiedEmail", 1),
 		Data:   Verification{AppId: appId, Email: email, UserId: userId},
 	}
 	return evt, nil
@@ -109,7 +103,7 @@ func SignIn(appId, email, password string, userById UserById, userIdByEmail User
 	}
 
 	evt := SignedInEvent{
-		Header: event.NewHeader(SIGNED_UP, 1),
+		Header: event.NewHeader("SignedUp", 1),
 		Data:   Session{UserId: userId, CreatedAt: time.Now()},
 	}
 	return evt, nil

@@ -70,12 +70,12 @@ func (self *authImpl) processEvents() *snapshotData {
 		data.LastEventDt = header.CreatedAt
 		var err error
 		switch header.Type {
-		case SIGNED_UP:
+		case "SignedUp":
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
 			evt := SignedUpEvent{Header: header, Data: user}
 			err = OnSignedUp(evt, data.UserById, data.UserIdByEmail)
-		case VERIFIED_EMAIL:
+		case "VerifiedEmail":
 			verification := Verification{}
 			self.es.MustLoadEventData(header, &verification)
 			evt := VerifiedEmailEvent{Header: header, Data: verification}

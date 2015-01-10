@@ -7,6 +7,8 @@ import (
 )
 
 type SnapshotData interface {
+	Load()
+	Save()
 }
 
 type impl struct {
@@ -21,12 +23,12 @@ type data struct {
 	VerificationByUserId map[string]Verification
 }
 
-func NewSnapshotData(store snapshot.Store) SnapshotData {
+func NewSnapshotData(store snapshot.Store) *SnapshotData {
 	return nil
 }
 
-func Load() {
+func (self *impl) Load() {
 }
 
-func Save() {
+func (self *impl) Save() {
 }

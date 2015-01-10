@@ -23,9 +23,9 @@ func NewAuth(es event.Store, ss snapshot.Store) Auth {
 }
 
 func (self *authImpl) SignUp(appId, email, password string) (userId string, err error) {
-	data := self.processEvents()
+	snapshotData := self.processEvents()
 
-	evt, err := SignUp(appId, email, password, data.UserById, data.UserIdByEmail)
+	evt, err := SignUp(appId, email, password, snapshotData)
 	if err != nil {
 		return
 	}
@@ -35,9 +35,9 @@ func (self *authImpl) SignUp(appId, email, password string) (userId string, err 
 }
 
 func (self *authImpl) VerifyEmail(appId, email, userId string) error {
-	data := self.processEvents()
+	snapshotData := self.processEvents()
 
-	evt, err := VerifyEmail(appId, email, userId, data.UserIdByEmail)
+	evt, err := VerifyEmail(appId, email, userId, snapshotData)
 	if err != nil {
 		return err
 	}
@@ -47,9 +47,9 @@ func (self *authImpl) VerifyEmail(appId, email, userId string) error {
 }
 
 func (self *authImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
-	data := self.processEvents()
+	snapshotData := self.processEvents()
 
-	evt, err := SignIn(appId, email, password, data.UserById, data.UserIdByEmail, data.VerificationByUserId)
+	evt, err := SignIn(appId, email, password, snapshotData)
 	if err != nil {
 		return sessionToken, err
 	}
@@ -58,28 +58,28 @@ func (self *authImpl) SignIn(appId, email, password string) (sessionToken string
 	return EncodeSession(evt.Data), nil
 }
 
-func (self *authImpl) processEvents() *snapshotData {
-	data := &snapshotData{}
-	self.ss.MustLoadSnapshot(AUTH_SNAPSHOT, data)
+func (self *authImpl) processEvents() SnapshotData {
+	snapshotData := NewSnapshotData(self.ss)
+	snapshotData.Load()
 
-	self.es.ForEachEventHeader(data.LastEventDt, func(header event.Header) (bool, error) {
-		data.LastEventDt = header.CreatedAt
+	self.es.ForEachEventHeader(snapshotData.GetLastEventDt(), func(header event.Header) (bool, error) {
+		snapshotData.SetLastEventDt(header.CreatedAt)
 		var err error
 		switch header.Type {
 		case "SignedUp":
 			user := User{}
 			self.es.MustLoadEventData(header, &user)
 			evt := SignedUpEvent{Header: header, Data: user}
-			err = OnSignedUp(evt, data.UserById, data.UserIdByEmail)
+			err = OnSignedUp(evt, snapshotData)
 		case "VerifiedEmail":
 			verification := Verification{}
 			self.es.MustLoadEventData(header, &verification)
 			evt := VerifiedEmailEvent{Header: header, Data: verification}
-			err = OnVerifiedEmail(evt, data.VerificationByUserId)
+			err = OnVerifiedEmail(evt, snapshotData)
 		}
 		return err == nil, err
 	})
 
-	self.ss.MustSaveSnapshot(AUTH_SNAPSHOT, data)
-	return data
+	snapshotData.Save()
+	return snapshotData
 }

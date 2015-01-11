@@ -52,3 +52,8 @@ func (self *impl) GetLastEventDt() time.Time {
 func (self *impl) SetLastEventDt(lastEventDt time.Time) {
 	self.data.LastEventDt = lastEventDt
 }
+
+func (self *impl) GetUserId(appId, email string) string {
+	// TODO should also consider appIdd
+	return self.data.UserIdByEmail[email]
+}

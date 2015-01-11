@@ -25,7 +25,6 @@ type Verification struct {
 	Email  string
 }
 
-
 type SignedUpEvent struct {
 	Header event.Header
 	Data   User
@@ -41,9 +40,8 @@ type VerifiedEmailEvent struct {
 	Data   Verification
 }
 
-func SignUp(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail) (SignedUpEvent, error) {
-	userId := userIdByEmail[email]
-	if userById[userId].AppId == appId {
+func SignUp(appId, email, password string, snapshotData SnapshotData) (SignedUpEvent, error) {
+	if snapshotData.GetUserId(appId, email) != "" {
 		return SignedUpEvent{}, ErrEmailAlreadyUsed
 	}
 

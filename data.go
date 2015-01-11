@@ -11,6 +11,7 @@ type SnapshotData interface {
 	Save()
 	GetLastEventDt() time.Time
 	SetLastEventDt(lastEventDt time.Time)
+	GetUserId(appId, email string) string
 }
 
 type impl struct {

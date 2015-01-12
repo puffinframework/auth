@@ -57,10 +57,9 @@ func SignUp(appId, email, password string, snapshotData SnapshotData) (SignedUpE
 	return evt, nil
 }
 
-func OnSignedUp(evt SignedUpEvent, userById UserById, userIdByEmail UserIdByEmail) error {
+func OnSignedUp(evt SignedUpEvent, snapshotData SnapshotData) error {
 	user := evt.Data
-	userById[user.Id] = user
-	userIdByEmail[user.Email] = user.Id
+	snapshotData.CreateUser(user)
 	return nil
 }
 

@@ -12,6 +12,7 @@ type SnapshotData interface {
 	GetLastEventDt() time.Time
 	SetLastEventDt(lastEventDt time.Time)
 	GetUserId(appId, email string) string
+	CreateUser(user User)
 }
 
 type impl struct {
@@ -57,4 +58,9 @@ func (self *impl) SetLastEventDt(lastEventDt time.Time) {
 func (self *impl) GetUserId(appId, email string) string {
 	// TODO should also consider appIdd
 	return self.data.UserIdByEmail[email]
+}
+
+func (self *impl) CreateUser(user User) {
+	self.data.UserById[user.Id] = user
+	self.data.UserIdByEmail[user.Email] = user.Id
 }

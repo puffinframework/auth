@@ -63,8 +63,8 @@ func OnSignedUp(evt SignedUpEvent, snapshotData SnapshotData) error {
 	return nil
 }
 
-func VerifyEmail(appId, email, userId string, userIdByEmail UserIdByEmail) (VerifiedEmailEvent, error) {
-	if userIdByEmail[email] != userId {
+func VerifyEmail(appId, email, userId string, snapshotData SnapshotData) (VerifiedEmailEvent, error) {
+	if snapshotData.GetUserId(appId, email) != userId {
 		return VerifiedEmailEvent{}, ErrVerificationDenied
 	}
 

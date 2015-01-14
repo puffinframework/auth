@@ -75,9 +75,9 @@ func VerifyEmail(appId, email, userId string, snapshotData SnapshotData) (Verifi
 	return evt, nil
 }
 
-func OnVerifiedEmail(evt VerifiedEmailEvent, verificationByUserId VerificationByUserId) error {
+func OnVerifiedEmail(evt VerifiedEmailEvent, snapshotData SnapshotData) error {
 	verification := evt.Data
-	verificationByUserId[verification.UserId] = verification
+	snapshotData.SetVerification(verification)
 	return nil
 }
 

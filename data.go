@@ -13,6 +13,7 @@ type SnapshotData interface {
 	SetLastEventDt(lastEventDt time.Time)
 	GetUserId(appId, email string) string
 	CreateUser(user User)
+	SetVerification(verification Verification)
 }
 
 type impl struct {
@@ -63,4 +64,8 @@ func (self *impl) GetUserId(appId, email string) string {
 func (self *impl) CreateUser(user User) {
 	self.data.UserById[user.Id] = user
 	self.data.UserIdByEmail[user.Email] = user.Id
+}
+
+func (self *impl) SetVerification(verification Verification) {
+	self.data.VerificationByUserId[verification.UserId] = verification
 }

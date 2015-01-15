@@ -81,15 +81,15 @@ func OnVerifiedEmail(evt VerifiedEmailEvent, snapshotData SnapshotData) error {
 	return nil
 }
 
-func SignIn(appId, email, password string, userById UserById, userIdByEmail UserIdByEmail, verificationByUserId VerificationByUserId) (SignedInEvent, error) {
-	userId := userIdByEmail[email]
+func SignIn(appId, email, password string, snapshotData SnapshotData) (SignedInEvent, error) {
+	userId := snapshotData.GetUserId(appId, email)
+	hashedPassword := snapshotData.GetHashedPassword(userId)
 
-	user := userById[userId]
-	if err := bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
 		return SignedInEvent{}, ErrSignInDenied
 	}
 
-	verification := verificationByUserId[userId]
+	verification := snapshotData.GetVerification(userId)
 	if verification.AppId != appId || verification.Email != email {
 		return SignedInEvent{}, ErrEmailNotVerified
 	}

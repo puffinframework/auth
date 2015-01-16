@@ -71,3 +71,11 @@ func (self *impl) CreateUser(user User) {
 func (self *impl) SetVerification(verification Verification) {
 	self.data.VerificationByUserId[verification.UserId] = verification
 }
+
+func (self *impl) GetHashedPassword(userId string) []byte {
+	return nil
+}
+
+func (self *impl) GetVerification(userId string) Verification {
+	return nil
+}

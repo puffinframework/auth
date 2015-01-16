@@ -14,6 +14,8 @@ type SnapshotData interface {
 	GetUserId(appId, email string) string
 	CreateUser(user User)
 	SetVerification(verification Verification)
+	GetHashedPassword(userId string) []byte
+	GetVerification(userId string) Verification
 }
 
 type impl struct {

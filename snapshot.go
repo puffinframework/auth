@@ -18,12 +18,12 @@ type SnapshotStore interface {
 	GetVerification(userId string) Verification
 }
 
-type impl struct {
+type implSnapshotStore struct {
 	store snapshot.Store
-	data  *data
+	data  *dataSnapshotStore
 }
 
-type data struct {
+type dataSnapshotStore struct {
 	LastEventDt          time.Time
 	UserById             map[string]User
 	UserIdByEmail        map[string]string
@@ -31,9 +31,9 @@ type data struct {
 }
 
 func NewSnapshotStore(store snapshot.Store) SnapshotStore {
-	return &impl{
+	return &implSnapshotStore{
 		store: store,
-		data: &data{
+		data: &dataSnapshotStore{
 			LastEventDt:          time.Unix(0, 0),
 			UserById:             make(map[string]User),
 			UserIdByEmail:        make(map[string]string),
@@ -42,41 +42,41 @@ func NewSnapshotStore(store snapshot.Store) SnapshotStore {
 	}
 }
 
-func (self *impl) Load() {
+func (self *implSnapshotStore) Load() {
 	self.store.MustLoadSnapshot("AuthSnapshot", self.data)
 }
 
-func (self *impl) Save() {
+func (self *implSnapshotStore) Save() {
 	self.store.MustSaveSnapshot("AuthSnapshot", self.data)
 }
 
-func (self *impl) GetLastEventDt() time.Time {
+func (self *implSnapshotStore) GetLastEventDt() time.Time {
 	return self.data.LastEventDt
 }
 
-func (self *impl) SetLastEventDt(lastEventDt time.Time) {
+func (self *implSnapshotStore) SetLastEventDt(lastEventDt time.Time) {
 	self.data.LastEventDt = lastEventDt
 }
 
-func (self *impl) GetUserId(appId, email string) string {
+func (self *implSnapshotStore) GetUserId(appId, email string) string {
 	// TODO should also consider appIdd
 	return self.data.UserIdByEmail[email]
 }
 
-func (self *impl) CreateUser(user User) {
+func (self *implSnapshotStore) CreateUser(user User) {
 	self.data.UserById[user.Id] = user
 	self.data.UserIdByEmail[user.Email] = user.Id
 }
 
-func (self *impl) SetVerification(verification Verification) {
+func (self *implSnapshotStore) SetVerification(verification Verification) {
 	self.data.VerificationByUserId[verification.UserId] = verification
 }
 
-func (self *impl) GetHashedPassword(userId string) []byte {
+func (self *implSnapshotStore) GetHashedPassword(userId string) []byte {
 	user := self.data.UserById[userId]
 	return user.HashedPassword
 }
 
-func (self *impl) GetVerification(userId string) Verification {
+func (self *implSnapshotStore) GetVerification(userId string) Verification {
 	return self.data.VerificationByUserId[userId]
 }

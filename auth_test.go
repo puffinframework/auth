@@ -20,15 +20,15 @@ func TestSignUp(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuth(eventStore, snapshotStore)
 
-	verificationToken, err := authService.SignUp("app1", "user1@test.com", "123")
+	verificationToken, err := authService.SignUp("app1", "puffinframework@mailinator.com", "123")
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", verificationToken)
 
-	verificationToken, err = authService.SignUp("app1", "user1@test.com", "qwe")
+	verificationToken, err = authService.SignUp("app1", "puffinframework@mailinator.com", "qwe")
 	assert.Equal(t, auth.ErrEmailAlreadyUsed, err)
 	assert.Equal(t, "", verificationToken)
 
-	verificationToken, err = authService.SignUp("app2", "user1@test.com", "asd")
+	verificationToken, err = authService.SignUp("app2", "puffinframework@mailinator.com", "asd")
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", verificationToken)
 }
@@ -42,23 +42,23 @@ func TestSignIn(t *testing.T) {
 	authService := auth.NewAuth(eventStore, snapshotStore)
 
 	// try to sign in without having signed up
-	sessionToken, err := authService.SignIn("app1", "user1@test.com", "123")
+	sessionToken, err := authService.SignIn("app1", "puffinframework@mailinator.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 	assert.Equal(t, "", sessionToken)
 
 	// sign up
-	verificationToken, err := authService.SignUp("app1", "user1@test.com", "123")
+	verificationToken, err := authService.SignUp("app1", "puffinframework@mailinator.com", "123")
 	assert.Nil(t, err)
 	verification, err := auth.DecodeVerification(verificationToken)
 	assert.Nil(t, err)
 
 	// try to sign in without having verified the email
-	sessionToken, err = authService.SignIn("app1", "user1@test.com", "123")
+	sessionToken, err = authService.SignIn("app1", "puffinframework@mailinator.com", "123")
 	assert.Equal(t, auth.ErrEmailNotVerified, err)
 	assert.Equal(t, "", sessionToken)
 
 	// verify email with the wrong user
-	wrongVerification := auth.Verification{AppId: verification.AppId, Email: "user832@test.com", UserId: verification.UserId}
+	wrongVerification := auth.Verification{AppId: "app2", Email: verification.Email, UserId: verification.UserId}
 	wrongVerificationToken := auth.EncodeVerification(wrongVerification)
 	err = authService.VerifyEmail(wrongVerificationToken)
 	assert.Equal(t, auth.ErrVerificationDenied, err)
@@ -68,12 +68,12 @@ func TestSignIn(t *testing.T) {
 	assert.Nil(t, nil)
 
 	// try to sign in with the wrong password
-	sessionToken, err = authService.SignIn("app1", "user1@test.com", "qwe")
+	sessionToken, err = authService.SignIn("app1", "puffinframework@mailinator.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 	assert.Equal(t, "", sessionToken)
 
 	// sign in
-	sessionToken, err = authService.SignIn("app1", "user1@test.com", "123")
+	sessionToken, err = authService.SignIn("app1", "puffinframework@mailinator.com", "123")
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", sessionToken)
 

@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func xTestSignUp(t *testing.T) {
+func TestSignUp(t *testing.T) {
 	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
 	eventStore := event.NewLeveldbStore()
 	defer eventStore.MustDestroy()
@@ -20,17 +20,17 @@ func xTestSignUp(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuth(eventStore, snapshotStore)
 
-	userId, err := authService.SignUp("app1", "user1@test.com", "123")
+	verificationToken, err := authService.SignUp("app1", "user1@test.com", "123")
 	assert.Nil(t, err)
-	assert.NotEqual(t, "", userId)
+	assert.NotEqual(t, "", verificationToken)
 
-	userId, err = authService.SignUp("app1", "user1@test.com", "qwe")
+	verificationToken, err = authService.SignUp("app1", "user1@test.com", "qwe")
 	assert.Equal(t, auth.ErrEmailAlreadyUsed, err)
-	assert.Equal(t, "", userId)
+	assert.Equal(t, "", verificationToken)
 
-	userId, err = authService.SignUp("app2", "user1@test.com", "asd")
+	verificationToken, err = authService.SignUp("app2", "user1@test.com", "asd")
 	assert.Nil(t, err)
-	assert.NotEqual(t, "", userId)
+	assert.NotEqual(t, "", verificationToken)
 }
 
 func TestSignIn(t *testing.T) {
@@ -44,9 +44,12 @@ func TestSignIn(t *testing.T) {
 	// try to sign in without having signed up
 	sessionToken, err := authService.SignIn("app1", "user1@test.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
+	assert.Equal(t, "", sessionToken)
 
 	// sign up
-	userId, err := authService.SignUp("app1", "user1@test.com", "123")
+	verificationToken, err := authService.SignUp("app1", "user1@test.com", "123")
+	assert.Nil(t, err)
+	verification, err := auth.DecodeVerification(verificationToken)
 	assert.Nil(t, err)
 
 	// try to sign in without having verified the email
@@ -55,11 +58,13 @@ func TestSignIn(t *testing.T) {
 	assert.Equal(t, "", sessionToken)
 
 	// verify email with the wrong user
-	err = authService.VerifyEmail("app1", "user832@test.com", userId)
+	wrongVerification := auth.Verification{AppId: verification.AppId, Email: "user832@test.com", UserId: verification.UserId}
+	wrongVerificationToken := auth.EncodeVerification(wrongVerification)
+	err = authService.VerifyEmail(wrongVerificationToken)
 	assert.Equal(t, auth.ErrVerificationDenied, err)
 
 	// verify email
-	err = authService.VerifyEmail("app1", "user1@test.com", userId)
+	err = authService.VerifyEmail(verificationToken)
 	assert.Nil(t, nil)
 
 	// try to sign in with the wrong password
@@ -74,7 +79,7 @@ func TestSignIn(t *testing.T) {
 
 	session, err := auth.DecodeSession(sessionToken)
 	assert.Nil(t, err)
-	assert.Equal(t, userId, session.UserId)
+	assert.Equal(t, verification.UserId, session.UserId)
 
 	now := time.Now()
 	t0 := now.Add(-1 * time.Minute)

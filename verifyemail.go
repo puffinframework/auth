@@ -9,14 +9,14 @@ type VerifiedEmailEvent struct {
 	Data   Verification
 }
 
-func VerifyEmail(appId, email, userId string, store SnapshotStore) (VerifiedEmailEvent, error) {
-	if store.GetUserId(appId, email) != userId {
+func VerifyEmail(verification Verification, store SnapshotStore) (VerifiedEmailEvent, error) {
+	if store.GetUserId(verification.AppId, verification.Email) != verification.UserId {
 		return VerifiedEmailEvent{}, ErrVerificationDenied
 	}
 
 	evt := VerifiedEmailEvent{
 		Header: event.NewHeader("VerifiedEmail", 1),
-		Data:   Verification{AppId: appId, Email: email, UserId: userId},
+		Data:   verification,
 	}
 	return evt, nil
 }

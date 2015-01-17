@@ -6,9 +6,9 @@ import (
 )
 
 type Auth interface {
-	SignUp(appId, email, password string) (userId string, err error)
+	SignUp(appId, email, password string) (verificationToken string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
-	VerifyEmail(appId, email, userId string) error
+	VerifyEmail(verificationToken string) error
 	//ResetPassword(resetToken string) error
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
@@ -22,7 +22,7 @@ func NewAuth(es event.Store, ss snapshot.Store) Auth {
 	return &implAuth{es: es, ss: ss}
 }
 
-func (self *implAuth) SignUp(appId, email, password string) (userId string, err error) {
+func (self *implAuth) SignUp(appId, email, password string) (verificationToken string, err error) {
 	store := self.processEvents()
 
 	evt, err := SignUp(appId, email, password, store)
@@ -31,13 +31,18 @@ func (self *implAuth) SignUp(appId, email, password string) (userId string, err 
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return evt.Data.Id, nil
+	return EncodeVerification(Verification{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 
-func (self *implAuth) VerifyEmail(appId, email, userId string) error {
+func (self *implAuth) VerifyEmail(verificationToken string) error {
 	store := self.processEvents()
 
-	evt, err := VerifyEmail(appId, email, userId, store)
+	verification, err := DecodeVerification(verificationToken)
+	if err != nil {
+		return err
+	}
+
+	evt, err := VerifyEmail(verification, store)
 	if err != nil {
 		return err
 	}

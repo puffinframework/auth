@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/puffinframework/event"
-	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,11 +24,6 @@ type Verification struct {
 	Email  string
 }
 
-type SignedUpEvent struct {
-	Header event.Header
-	Data   User
-}
-
 type SignedInEvent struct {
 	Header event.Header
 	Data   Session
@@ -38,29 +32,6 @@ type SignedInEvent struct {
 type VerifiedEmailEvent struct {
 	Header event.Header
 	Data   Verification
-}
-
-func SignUp(appId, email, password string, snapshotData SnapshotData) (SignedUpEvent, error) {
-	if snapshotData.GetUserId(appId, email) != "" {
-		return SignedUpEvent{}, ErrEmailAlreadyUsed
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-	if err != nil {
-		return SignedUpEvent{}, err
-	}
-
-	evt := SignedUpEvent{
-		Header: event.NewHeader("SignedUp", 1),
-		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
-	}
-	return evt, nil
-}
-
-func OnSignedUp(evt SignedUpEvent, snapshotData SnapshotData) error {
-	user := evt.Data
-	snapshotData.CreateUser(user)
-	return nil
 }
 
 func VerifyEmail(appId, email, userId string, snapshotData SnapshotData) (VerifiedEmailEvent, error) {

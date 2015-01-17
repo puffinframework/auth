@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"strings"
 	"time"
 
 	"github.com/puffinframework/snapshot"
@@ -26,7 +27,7 @@ type implSnapshotStore struct {
 type dataSnapshotStore struct {
 	LastEventDt          time.Time
 	UserById             map[string]User
-	UserIdByEmail        map[string]string
+	UserIdByAppIdEmail   map[string]string
 	VerificationByUserId map[string]Verification
 }
 
@@ -36,7 +37,7 @@ func NewSnapshotStore(store snapshot.Store) SnapshotStore {
 		data: &dataSnapshotStore{
 			LastEventDt:          time.Unix(0, 0),
 			UserById:             make(map[string]User),
-			UserIdByEmail:        make(map[string]string),
+			UserIdByAppIdEmail:        make(map[string]string),
 			VerificationByUserId: make(map[string]Verification),
 		},
 	}
@@ -59,13 +60,14 @@ func (self *implSnapshotStore) SetLastEventDt(lastEventDt time.Time) {
 }
 
 func (self *implSnapshotStore) GetUserId(appId, email string) string {
-	// TODO should also consider appIdd
-	return self.data.UserIdByEmail[email]
+	key := joinAppIdEmail(appId, email)
+	return self.data.UserIdByAppIdEmail[key]
 }
 
 func (self *implSnapshotStore) CreateUser(user User) {
+	key := joinAppIdEmail(user.AppId, user.Email)
+	self.data.UserIdByAppIdEmail[key] = user.Id
 	self.data.UserById[user.Id] = user
-	self.data.UserIdByEmail[user.Email] = user.Id
 }
 
 func (self *implSnapshotStore) SetVerification(verification Verification) {
@@ -80,3 +82,8 @@ func (self *implSnapshotStore) GetHashedPassword(userId string) []byte {
 func (self *implSnapshotStore) GetVerification(userId string) Verification {
 	return self.data.VerificationByUserId[userId]
 }
+
+func joinAppIdEmail(appId, email string) string {
+	return strings.Join([]string{ appId, email }, "::")
+}
+

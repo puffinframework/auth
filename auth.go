@@ -13,16 +13,16 @@ type Auth interface {
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
 
-type authImpl struct {
+type implAuth struct {
 	es event.Store
 	ss snapshot.Store
 }
 
 func NewAuth(es event.Store, ss snapshot.Store) Auth {
-	return &authImpl{es: es, ss: ss}
+	return &implAuth{es: es, ss: ss}
 }
 
-func (self *authImpl) SignUp(appId, email, password string) (userId string, err error) {
+func (self *implAuth) SignUp(appId, email, password string) (userId string, err error) {
 	store := self.processEvents()
 
 	evt, err := SignUp(appId, email, password, store)
@@ -34,7 +34,7 @@ func (self *authImpl) SignUp(appId, email, password string) (userId string, err 
 	return evt.Data.Id, nil
 }
 
-func (self *authImpl) VerifyEmail(appId, email, userId string) error {
+func (self *implAuth) VerifyEmail(appId, email, userId string) error {
 	store := self.processEvents()
 
 	evt, err := VerifyEmail(appId, email, userId, store)
@@ -46,7 +46,7 @@ func (self *authImpl) VerifyEmail(appId, email, userId string) error {
 	return nil
 }
 
-func (self *authImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
+func (self *implAuth) SignIn(appId, email, password string) (sessionToken string, err error) {
 	store := self.processEvents()
 
 	evt, err := SignIn(appId, email, password, store)
@@ -58,7 +58,7 @@ func (self *authImpl) SignIn(appId, email, password string) (sessionToken string
 	return EncodeSession(evt.Data), nil
 }
 
-func (self *authImpl) processEvents() SnapshotStore {
+func (self *implAuth) processEvents() SnapshotStore {
 	store := NewSnapshotStore(self.ss)
 	store.Load()
 

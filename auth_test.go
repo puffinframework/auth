@@ -18,7 +18,7 @@ func TestSignUp(t *testing.T) {
 	defer eventStore.MustDestroy()
 	snapshotStore := snapshot.NewLeveldbStore()
 	defer snapshotStore.MustDestroy()
-	authService := auth.NewAuth(eventStore, snapshotStore)
+	authService := auth.NewAuthService(eventStore, snapshotStore)
 
 	verificationToken, err := authService.SignUp("app1", "puffinframework@mailinator.com", "123")
 	assert.Nil(t, err)
@@ -39,7 +39,7 @@ func TestSignIn(t *testing.T) {
 	defer eventStore.MustDestroy()
 	snapshotStore := snapshot.NewLeveldbStore()
 	defer snapshotStore.MustDestroy()
-	authService := auth.NewAuth(eventStore, snapshotStore)
+	authService := auth.NewAuthService(eventStore, snapshotStore)
 
 	// try to sign in without having signed up
 	sessionToken, err := authService.SignIn("app1", "puffinframework@mailinator.com", "123")

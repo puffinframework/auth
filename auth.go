@@ -5,7 +5,7 @@ import (
 	"github.com/puffinframework/snapshot"
 )
 
-type Auth interface {
+type AuthService interface {
 	SignUp(appId, email, password string) (verificationToken string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
 	VerifyEmail(verificationToken string) error
@@ -13,16 +13,16 @@ type Auth interface {
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
 
-type implAuth struct {
+type implAuthService struct {
 	es event.Store
 	ss snapshot.Store
 }
 
-func NewAuth(es event.Store, ss snapshot.Store) Auth {
-	return &implAuth{es: es, ss: ss}
+func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
+	return &implAuthService{es: es, ss: ss}
 }
 
-func (self *implAuth) SignUp(appId, email, password string) (verificationToken string, err error) {
+func (self *implAuthService) SignUp(appId, email, password string) (verificationToken string, err error) {
 	store := self.processEvents()
 
 	evt, err := SignUp(appId, email, password, store)
@@ -34,7 +34,7 @@ func (self *implAuth) SignUp(appId, email, password string) (verificationToken s
 	return EncodeVerification(Verification{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 
-func (self *implAuth) VerifyEmail(verificationToken string) error {
+func (self *implAuthService) VerifyEmail(verificationToken string) error {
 	store := self.processEvents()
 
 	verification, err := DecodeVerification(verificationToken)
@@ -51,7 +51,7 @@ func (self *implAuth) VerifyEmail(verificationToken string) error {
 	return nil
 }
 
-func (self *implAuth) SignIn(appId, email, password string) (sessionToken string, err error) {
+func (self *implAuthService) SignIn(appId, email, password string) (sessionToken string, err error) {
 	store := self.processEvents()
 
 	evt, err := SignIn(appId, email, password, store)
@@ -63,7 +63,7 @@ func (self *implAuth) SignIn(appId, email, password string) (sessionToken string
 	return EncodeSession(evt.Data), nil
 }
 
-func (self *implAuth) processEvents() SnapshotStore {
+func (self *implAuthService) processEvents() SnapshotStore {
 	store := NewSnapshotStore(self.ss)
 	store.Load()
 

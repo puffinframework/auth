@@ -26,7 +26,7 @@ func SignIn(appId, email, password string, snapshotData SnapshotData) (SignedInE
 	}
 
 	evt := SignedInEvent{
-		Header: event.NewHeader("SignedUp", 1),
+		Header: event.NewHeader("SignedIn", 1),
 		Data:   Session{UserId: userId, CreatedAt: time.Now()},
 	}
 	return evt, nil

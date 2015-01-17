@@ -12,10 +12,10 @@ type SnapshotStore interface {
 	Save()
 	GetLastEventDt() time.Time
 	SetLastEventDt(lastEventDt time.Time)
-	GetUserId(appId, email string) string
 	CreateUser(user User)
-	SetVerification(verification Verification)
+	GetUserId(appId, email string) string
 	GetHashedPassword(userId string) []byte
+	SetVerification(verification Verification)
 	GetVerification(userId string) Verification
 }
 
@@ -59,24 +59,24 @@ func (self *implSnapshotStore) SetLastEventDt(lastEventDt time.Time) {
 	self.data.LastEventDt = lastEventDt
 }
 
-func (self *implSnapshotStore) GetUserId(appId, email string) string {
-	key := joinAppIdEmail(appId, email)
-	return self.data.UserIdByAppIdEmail[key]
-}
-
 func (self *implSnapshotStore) CreateUser(user User) {
 	key := joinAppIdEmail(user.AppId, user.Email)
 	self.data.UserIdByAppIdEmail[key] = user.Id
 	self.data.UserById[user.Id] = user
 }
 
-func (self *implSnapshotStore) SetVerification(verification Verification) {
-	self.data.VerificationByUserId[verification.UserId] = verification
+func (self *implSnapshotStore) GetUserId(appId, email string) string {
+	key := joinAppIdEmail(appId, email)
+	return self.data.UserIdByAppIdEmail[key]
 }
 
 func (self *implSnapshotStore) GetHashedPassword(userId string) []byte {
 	user := self.data.UserById[userId]
 	return user.HashedPassword
+}
+
+func (self *implSnapshotStore) SetVerification(verification Verification) {
+	self.data.VerificationByUserId[verification.UserId] = verification
 }
 
 func (self *implSnapshotStore) GetVerification(userId string) Verification {

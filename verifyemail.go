@@ -26,4 +26,3 @@ func OnVerifiedEmail(evt VerifiedEmailEvent, store SnapshotStore) error {
 	store.SetVerification(verification)
 	return nil
 }
-

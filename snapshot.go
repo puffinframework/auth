@@ -37,7 +37,7 @@ func NewSnapshotStore(store snapshot.Store) SnapshotStore {
 		data: &dataSnapshotStore{
 			LastEventDt:          time.Unix(0, 0),
 			UserById:             make(map[string]User),
-			UserIdByAppIdEmail:        make(map[string]string),
+			UserIdByAppIdEmail:   make(map[string]string),
 			VerificationByUserId: make(map[string]Verification),
 		},
 	}
@@ -84,6 +84,5 @@ func (self *implSnapshotStore) GetVerification(userId string) Verification {
 }
 
 func joinAppIdEmail(appId, email string) string {
-	return strings.Join([]string{ appId, email }, "::")
+	return strings.Join([]string{appId, email}, "::")
 }
-

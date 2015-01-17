@@ -12,15 +12,15 @@ type SignedInEvent struct {
 	Data   Session
 }
 
-func SignIn(appId, email, password string, snapshotData SnapshotData) (SignedInEvent, error) {
-	userId := snapshotData.GetUserId(appId, email)
-	hashedPassword := snapshotData.GetHashedPassword(userId)
+func SignIn(appId, email, password string, store SnapshotStore) (SignedInEvent, error) {
+	userId := store.GetUserId(appId, email)
+	hashedPassword := store.GetHashedPassword(userId)
 
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
 		return SignedInEvent{}, ErrSignInDenied
 	}
 
-	verification := snapshotData.GetVerification(userId)
+	verification := store.GetVerification(userId)
 	if verification.AppId != appId || verification.Email != email {
 		return SignedInEvent{}, ErrEmailNotVerified
 	}

@@ -11,8 +11,8 @@ type SignedUpEvent struct {
 	Data   User
 }
 
-func SignUp(appId, email, password string, snapshotData SnapshotData) (SignedUpEvent, error) {
-	if snapshotData.GetUserId(appId, email) != "" {
+func SignUp(appId, email, password string, store SnapshotStore) (SignedUpEvent, error) {
+	if store.GetUserId(appId, email) != "" {
 		return SignedUpEvent{}, ErrEmailAlreadyUsed
 	}
 
@@ -28,8 +28,8 @@ func SignUp(appId, email, password string, snapshotData SnapshotData) (SignedUpE
 	return evt, nil
 }
 
-func OnSignedUp(evt SignedUpEvent, snapshotData SnapshotData) error {
+func OnSignedUp(evt SignedUpEvent, store SnapshotStore) error {
 	user := evt.Data
-	snapshotData.CreateUser(user)
+	store.CreateUser(user)
 	return nil
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/puffinframework/snapshot"
 )
 
-type SnapshotData interface {
+type SnapshotStore interface {
 	Load()
 	Save()
 	GetLastEventDt() time.Time
@@ -30,7 +30,7 @@ type data struct {
 	VerificationByUserId map[string]Verification
 }
 
-func NewSnapshotData(store snapshot.Store) SnapshotData {
+func NewSnapshotStore(store snapshot.Store) SnapshotStore {
 	return &impl{
 		store: store,
 		data: &data{

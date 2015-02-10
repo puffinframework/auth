@@ -60,11 +60,11 @@ func TestSignIn(t *testing.T) {
 	// verify email with the wrong user
 	wrongVerification := auth.Verification{AppId: "app2", Email: verification.Email, UserId: verification.UserId}
 	wrongVerificationToken := auth.EncodeVerification(wrongVerification)
-	err = authService.VerifyEmail(wrongVerificationToken)
+	err = authService.VerifyAccount(wrongVerificationToken)
 	assert.Equal(t, auth.ErrVerificationDenied, err)
 
 	// verify email
-	err = authService.VerifyEmail(verificationToken)
+	err = authService.VerifyAccount(verificationToken)
 	assert.Nil(t, nil)
 
 	// try to sign in with the wrong password

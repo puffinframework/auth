@@ -8,7 +8,7 @@ import (
 type AuthService interface {
 	SignUp(appId, email, password string) (verificationToken string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
-	VerifyEmail(verificationToken string) error
+	VerifyAccount(verificationToken string) error
 	//ResetPassword(resetToken string) error
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
@@ -34,7 +34,7 @@ func (self *implAuthService) SignUp(appId, email, password string) (verification
 	return EncodeVerification(Verification{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 
-func (self *implAuthService) VerifyEmail(verificationToken string) error {
+func (self *implAuthService) VerifyAccount(verificationToken string) error {
 	store := self.processEvents()
 
 	verification, err := DecodeVerification(verificationToken)
@@ -42,7 +42,7 @@ func (self *implAuthService) VerifyEmail(verificationToken string) error {
 		return err
 	}
 
-	evt, err := VerifyEmail(verification, store)
+	evt, err := VerifyAccount(verification, store)
 	if err != nil {
 		return err
 	}
@@ -76,11 +76,11 @@ func (self *implAuthService) processEvents() SnapshotStore {
 			self.es.MustLoadEventData(header, &user)
 			evt := SignedUpEvent{Header: header, Data: user}
 			err = OnSignedUp(evt, store)
-		case "VerifiedEmail":
+		case "VerifiedAccount":
 			verification := Verification{}
 			self.es.MustLoadEventData(header, &verification)
-			evt := VerifiedEmailEvent{Header: header, Data: verification}
-			err = OnVerifiedEmail(evt, store)
+			evt := VerifiedAccountEvent{Header: header, Data: verification}
+			err = OnVerifiedAccount(evt, store)
 		}
 		return err == nil, err
 	})

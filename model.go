@@ -21,3 +21,9 @@ type Verification struct {
 	AppId  string
 	Email  string
 }
+
+type ResetPasswordRequest struct {
+	UserId string
+	AppId  string
+	Email  string
+}

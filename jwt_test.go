@@ -55,3 +55,17 @@ func TestVerificationEncoding(t *testing.T) {
 	assert.Equal(t, email, verification.Email)
 	assert.Equal(t, userId, verification.UserId)
 }
+
+func TestResetPasswordRequestEncoding(t *testing.T) {
+	appId := "app-1"
+	userId := "user-1"
+	email := "user@app.com"
+
+	requestToken := auth.EncodeResetPasswordRequest(auth.ResetPasswordRequest{AppId: appId, Email: email, UserId: userId})
+
+	request, err := auth.DecodeResetPasswordRequest(requestToken)
+	assert.Nil(t, err)
+	assert.Equal(t, appId, request.AppId)
+	assert.Equal(t, email, request.Email)
+	assert.Equal(t, userId, request.UserId)
+}

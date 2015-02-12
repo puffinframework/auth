@@ -68,3 +68,34 @@ func DecodeVerification(verificationToken string) (Verification, error) {
 	}
 	return verification, nil
 }
+
+func EncodeResetPasswordRequest(request ResetPasswordRequest) string {
+	token := jwt.New(jwt.SigningMethodHS256)
+	token.Claims["appId"] = request.AppId
+	token.Claims["email"] = request.Email
+	token.Claims["userId"] = request.UserId
+	requestToken, err := token.SignedString([]byte(jwtkey))
+	if err != nil {
+		log.Fatalln("[SignIn] couldn't create jwt", err)
+	}
+	return requestToken
+}
+
+func DecodeResetPasswordRequest(requestToken string) (ResetPasswordRequest, error) {
+	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtkey), nil
+	})
+	if err != nil {
+		return ResetPasswordRequest{}, err
+	}
+	if !token.Valid {
+		return ResetPasswordRequest{}, ErrJwtNotValid
+	}
+
+	request := ResetPasswordRequest{
+		AppId:  token.Claims["appId"].(string),
+		Email:  token.Claims["email"].(string),
+		UserId: token.Claims["userId"].(string),
+	}
+	return request, nil
+}

@@ -17,6 +17,7 @@ type SnapshotStore interface {
 	GetHashedPassword(userId string) []byte
 	SetVerification(verification Verification)
 	GetVerification(userId string) Verification
+	SetResetPasswordRequest(request ResetPasswordRequest)
 }
 
 type implSnapshotStore struct {
@@ -25,10 +26,11 @@ type implSnapshotStore struct {
 }
 
 type dataSnapshotStore struct {
-	LastEventDt          time.Time
-	UserById             map[string]User
-	UserIdByAppIdEmail   map[string]string
-	VerificationByUserId map[string]Verification
+	LastEventDt                  time.Time
+	UserById                     map[string]User
+	UserIdByAppIdEmail           map[string]string
+	VerificationByUserId         map[string]Verification
+	ResetPasswordRequestByUserId map[string]ResetPasswordRequest
 }
 
 func NewSnapshotStore(store snapshot.Store) SnapshotStore {
@@ -85,4 +87,8 @@ func (self *implSnapshotStore) GetVerification(userId string) Verification {
 
 func joinAppIdEmail(appId, email string) string {
 	return strings.Join([]string{appId, email}, "::")
+}
+
+func (self *implSnapshotStore) SetResetPasswordRequest(request ResetPasswordRequest) {
+	self.data.ResetPasswordRequestByUserId[request.UserId] = request
 }

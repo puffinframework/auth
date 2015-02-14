@@ -69,13 +69,13 @@ func (self *implAuthService) RequestResetPassword(appId, email string) (resetTok
 	/* TODO
 	store := self.processEvents()
 
-	evt, err := RequestResetPassword(email, store)
+	evt, err := RequestResetPassword(appId, email, store)
 	if err != nil {
 		return
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return EncodeResetPasswordRequest(ResetPasswordRequest{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id}), nil
+	return EncodeResetPasswordRequest(ResetPasswordRequest{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id, CreatedAt: evt.Data.CreatedAt}), nil
 	*/
 }
 

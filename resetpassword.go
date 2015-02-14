@@ -9,7 +9,8 @@ type RequestedResetPasswordEvent struct {
 	Data   ResetPasswordRequest
 }
 
-func RequestResetPassword(request ResetPasswordRequest, store SnapshotStore) (RequestedResetPasswordEvent, error) {
+func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
+	/* TODO
 	if store.GetUserId(request.AppId, request.Email) != request.UserId {
 		return RequestedResetPasswordEvent{}, ErrRequestResetPasswordDenied
 	}
@@ -19,6 +20,8 @@ func RequestResetPassword(request ResetPasswordRequest, store SnapshotStore) (Re
 		Data:   request,
 	}
 	return evt, nil
+	*/
+	return RequestedResetPasswordEvent{}, nil
 }
 
 func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotStore) error {

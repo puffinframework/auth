@@ -9,7 +9,7 @@ type AuthService interface {
 	SignUp(appId, email, password string) (verificationToken string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
 	VerifyAccount(verificationToken string) error
-	RequestResetPassword(email string) (resetToken string, err error)
+	RequestResetPassword(appId, email string) (resetToken string, err error)
 	//ConfirmResetPassword(resetToken string, newPassword string) error
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
@@ -64,7 +64,7 @@ func (self *implAuthService) SignIn(appId, email, password string) (sessionToken
 	return EncodeSession(evt.Data), nil
 }
 
-func (self *implAuthService) RequestResetPassword(email string) (resetToken string, err error) {
+func (self *implAuthService) RequestResetPassword(appId, email string) (resetToken string, err error) {
 	return "", nil
 	/* TODO
 	store := self.processEvents()

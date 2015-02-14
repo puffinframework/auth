@@ -23,7 +23,8 @@ type Verification struct {
 }
 
 type ResetPasswordRequest struct {
-	UserId string
-	AppId  string
-	Email  string
+	UserId    string
+	AppId     string
+	Email     string
+	CreatedAt time.Time
 }

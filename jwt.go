@@ -74,6 +74,7 @@ func EncodeResetPasswordRequest(request ResetPasswordRequest) string {
 	token.Claims["appId"] = request.AppId
 	token.Claims["email"] = request.Email
 	token.Claims["userId"] = request.UserId
+	token.Claims["createdAt"] = request.CreatedAt.Unix()
 	requestToken, err := token.SignedString([]byte(jwtkey))
 	if err != nil {
 		log.Fatalln("[SignIn] couldn't create jwt", err)
@@ -93,9 +94,10 @@ func DecodeResetPasswordRequest(requestToken string) (ResetPasswordRequest, erro
 	}
 
 	request := ResetPasswordRequest{
-		AppId:  token.Claims["appId"].(string),
-		Email:  token.Claims["email"].(string),
-		UserId: token.Claims["userId"].(string),
+		AppId:     token.Claims["appId"].(string),
+		Email:     token.Claims["email"].(string),
+		UserId:    token.Claims["userId"].(string),
+		CreatedAt: time.Unix(int64(token.Claims["createdAt"].(float64)), 0),
 	}
 	return request, nil
 }

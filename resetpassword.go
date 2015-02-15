@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"time"
+
 	"github.com/puffinframework/event"
 )
 
@@ -10,18 +12,21 @@ type RequestedResetPasswordEvent struct {
 }
 
 func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
-	if store.GetUserId(appId, email) == "" {
+	userId := store.GetUserId(appId, email)
+	if userId == "" {
 		return RequestedResetPasswordEvent{}, ErrRequestResetPasswordDenied
 	}
 
-	/* TODO
 	evt := RequestedResetPasswordEvent{
 		Header: event.NewHeader("RequestedResetPassword", 1),
-		Data:   request,
+		Data: ResetPasswordRequest{
+			AppId:     appId,
+			Email:     email,
+			UserId:    userId,
+			CreatedAt: time.Now(),
+		},
 	}
 	return evt, nil
-	*/
-	return RequestedResetPasswordEvent{}, nil
 }
 
 func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotStore) error {

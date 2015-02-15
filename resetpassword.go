@@ -10,11 +10,11 @@ type RequestedResetPasswordEvent struct {
 }
 
 func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
-	/* TODO
-	if store.GetUserId(request.AppId, request.Email) != request.UserId {
+	if store.GetUserId(appId, email) == "" {
 		return RequestedResetPasswordEvent{}, ErrRequestResetPasswordDenied
 	}
 
+	/* TODO
 	evt := RequestedResetPasswordEvent{
 		Header: event.NewHeader("RequestedResetPassword", 1),
 		Data:   request,

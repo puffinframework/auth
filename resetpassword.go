@@ -17,6 +17,11 @@ func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedRe
 		return RequestedResetPasswordEvent{}, ErrRequestResetPasswordDenied
 	}
 
+	verification := store.GetVerification(userId)
+	if verification.AppId != appId || verification.Email != email {
+		return RequestedResetPasswordEvent{}, ErrEmailNotVerified
+	}
+
 	evt := RequestedResetPasswordEvent{
 		Header: event.NewHeader("RequestedResetPassword", 1),
 		Data: ResetPasswordRequest{

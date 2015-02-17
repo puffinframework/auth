@@ -14,7 +14,7 @@ type RequestedResetPasswordEvent struct {
 func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
 	userId := store.GetUserId(appId, email)
 	if userId == "" {
-		return RequestedResetPasswordEvent{}, ErrRequestResetPasswordDenied
+		return RequestedResetPasswordEvent{}, ErrResetPasswordDenied
 	}
 
 	verification := store.GetVerification(userId)

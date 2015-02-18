@@ -88,3 +88,6 @@ func TestSignIn(t *testing.T) {
 	assert.True(t, t0.Before(session.CreatedAt))
 	assert.True(t, t1.After(session.CreatedAt))
 }
+
+func TestResetPassword(t *testing.T) {
+}

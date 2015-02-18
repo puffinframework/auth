@@ -20,15 +20,15 @@ func TestSignUp(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
-	verificationToken, err := authService.SignUp("app1", "puffinframework@mailinator.com", "123")
+	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "123")
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", verificationToken)
 
-	verificationToken, err = authService.SignUp("app1", "puffinframework@mailinator.com", "qwe")
+	verificationToken, err = authService.SignUp("app1", "puffin1@mailinator.com", "qwe")
 	assert.Equal(t, auth.ErrEmailAlreadyUsed, err)
 	assert.Equal(t, "", verificationToken)
 
-	verificationToken, err = authService.SignUp("app2", "puffinframework@mailinator.com", "asd")
+	verificationToken, err = authService.SignUp("app2", "puffin1@mailinator.com", "asd")
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", verificationToken)
 }
@@ -42,18 +42,18 @@ func TestSignIn(t *testing.T) {
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
 	// try to sign in without having signed up
-	sessionToken, err := authService.SignIn("app1", "puffinframework@mailinator.com", "123")
+	sessionToken, err := authService.SignIn("app1", "puffin1@mailinator.com", "123")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 	assert.Equal(t, "", sessionToken)
 
 	// sign up
-	verificationToken, err := authService.SignUp("app1", "puffinframework@mailinator.com", "123")
+	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "123")
 	assert.Nil(t, err)
 	verification, err := auth.DecodeVerification(verificationToken)
 	assert.Nil(t, err)
 
 	// try to sign in without having verified the email
-	sessionToken, err = authService.SignIn("app1", "puffinframework@mailinator.com", "123")
+	sessionToken, err = authService.SignIn("app1", "puffin1@mailinator.com", "123")
 	assert.Equal(t, auth.ErrEmailNotVerified, err)
 	assert.Equal(t, "", sessionToken)
 
@@ -68,12 +68,12 @@ func TestSignIn(t *testing.T) {
 	assert.Nil(t, nil)
 
 	// try to sign in with the wrong password
-	sessionToken, err = authService.SignIn("app1", "puffinframework@mailinator.com", "qwe")
+	sessionToken, err = authService.SignIn("app1", "puffin1@mailinator.com", "qwe")
 	assert.Equal(t, auth.ErrSignInDenied, err)
 	assert.Equal(t, "", sessionToken)
 
 	// sign in
-	sessionToken, err = authService.SignIn("app1", "puffinframework@mailinator.com", "123")
+	sessionToken, err = authService.SignIn("app1", "puffin1@mailinator.com", "123")
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", sessionToken)
 
@@ -90,4 +90,18 @@ func TestSignIn(t *testing.T) {
 }
 
 func TestResetPassword(t *testing.T) {
+	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
+	eventStore := event.NewLeveldbStore()
+	defer eventStore.MustDestroy()
+	snapshotStore := snapshot.NewLeveldbStore()
+	defer snapshotStore.MustDestroy()
+	authService := auth.NewAuthService(eventStore, snapshotStore)
+
+	// sign up
+	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "123")
+	assert.Nil(t, err)
+
+	// verify email
+	err = authService.VerifyAccount(verificationToken)
+	assert.Nil(t, nil)
 }

@@ -65,7 +65,7 @@ func TestSignIn(t *testing.T) {
 
 	// verify email
 	err = authService.VerifyAccount(verificationToken)
-	assert.Nil(t, nil)
+	assert.Nil(t, err)
 
 	// try to sign in with the wrong password
 	sessionToken, err = authService.SignIn("app1", "puffin1@mailinator.com", "qwe")
@@ -103,5 +103,10 @@ func TestResetPassword(t *testing.T) {
 
 	// verify email
 	err = authService.VerifyAccount(verificationToken)
-	assert.Nil(t, nil)
+	assert.Nil(t, err)
+
+
+	authService.RequestResetPassword("app1", "puffin1@mailinagor.com")
+	assert.Nil(t, err)
+	// TODO
 }

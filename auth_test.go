@@ -57,13 +57,13 @@ func TestSignIn(t *testing.T) {
 	assert.Equal(t, auth.ErrEmailNotVerified, err)
 	assert.Equal(t, "", sessionToken)
 
-	// verify email with the wrong user
+	// verify account with the wrong user
 	wrongVerification := auth.Verification{AppId: "app2", Email: verification.Email, UserId: verification.UserId}
 	wrongVerificationToken := auth.EncodeVerification(wrongVerification)
 	err = authService.VerifyAccount(wrongVerificationToken)
 	assert.Equal(t, auth.ErrVerificationDenied, err)
 
-	// verify email
+	// verify account
 	err = authService.VerifyAccount(verificationToken)
 	assert.Nil(t, err)
 
@@ -101,11 +101,15 @@ func TestResetPassword(t *testing.T) {
 	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "123")
 	assert.Nil(t, err)
 
-	// verify email
+	// try to reset password before verify the account
+	authService.RequestResetPassword("app1", "puffin1@mailinagor.com")
+	assert.NotNil(t, err)
+
+	// verify account
 	err = authService.VerifyAccount(verificationToken)
 	assert.Nil(t, err)
 
-
+	// reset password
 	authService.RequestResetPassword("app1", "puffin1@mailinagor.com")
 	assert.Nil(t, err)
 	// TODO

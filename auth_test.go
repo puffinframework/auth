@@ -97,20 +97,27 @@ func TestResetPassword(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
+	// try to reset password before sign up
+	resetToken, err := authService.RequestResetPassword("app1", "puffin1@mailinator.com")
+	assert.Equal(t, auth.ErrResetPasswordDenied, err)
+	assert.Equal(t, "", resetToken)
+
 	// sign up
 	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "123")
 	assert.Nil(t, err)
 
-	// try to reset password before verify the account
-	authService.RequestResetPassword("app1", "puffin1@mailinagor.com")
-	assert.NotNil(t, err)
+	// try to reset password before verify account
+	resetToken, err = authService.RequestResetPassword("app1", "puffin1@mailinator.com")
+	assert.Equal(t, auth.ErrEmailNotVerified, err)
+	assert.Equal(t, "", resetToken)
 
 	// verify account
 	err = authService.VerifyAccount(verificationToken)
 	assert.Nil(t, err)
 
 	// reset password
-	authService.RequestResetPassword("app1", "puffin1@mailinagor.com")
+	resetToken, err = authService.RequestResetPassword("app1", "puffin1@mailinator.com")
 	assert.Nil(t, err)
+
 	// TODO
 }

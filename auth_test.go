@@ -118,7 +118,7 @@ func TestResetPassword(t *testing.T) {
 	// reset password
 	resetToken, err = authService.RequestResetPassword("app1", "puffin1@mailinator.com")
 	assert.Nil(t, err)
-	_, err := auth.DecodeResetPasswordRequest(resetToken)
+	_, err = auth.DecodeResetPasswordRequest(resetToken)
 	assert.Nil(t, err)
 
 	// TODO

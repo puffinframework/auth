@@ -77,9 +77,6 @@ func (self *implAuthService) RequestResetPassword(appId, email string) (resetTok
 }
 
 func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword string) error {
-	// TODO
-	return nil
-	/*
 	store := self.processEvents()
 
 	evt, err := ConfirmResetPassword(resetToken, newPassword, store)
@@ -89,7 +86,6 @@ func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return nil
-	*/
 }
 
 func (self *implAuthService) processEvents() SnapshotStore {

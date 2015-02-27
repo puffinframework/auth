@@ -34,8 +34,18 @@ func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedRe
 	return evt, nil
 }
 
+type ConfirmedResetPasswordEvent struct {
+	Header event.Header
+	Data ResetPasswordRequest
+}
+
 func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotStore) error {
 	request := evt.Data
 	store.SetResetPasswordRequest(request)
 	return nil
+}
+
+func ConfirmResetPassword(resetToken string, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
+	// TODO
+	return ConfirmedResetPasswordEvent{}, nil
 }

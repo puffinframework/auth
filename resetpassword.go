@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/puffinframework/event"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type RequestedResetPasswordEvent struct {
@@ -13,7 +14,10 @@ type RequestedResetPasswordEvent struct {
 
 type ConfirmedResetPasswordEvent struct {
 	Header event.Header
-	Data ResetPasswordRequest
+	Data   struct {
+		UserId         string
+		HashedPassword []byte
+	}
 }
 
 func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
@@ -50,9 +54,15 @@ func ConfirmResetPassword(request ResetPasswordRequest, newPassword string, stor
 		return ConfirmedResetPasswordEvent{}, ErrVerificationDenied
 	}
 
-	evt := ConfirmedResetPasswordEvent{
-		Header: event.NewHeader("ConfirmResetPassword", 1),
-		Data:   request,
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
+	if err != nil {
+		return ConfirmedResetPasswordEvent{}, err
 	}
+
+	evt := ConfirmedResetPasswordEvent{
+		Header: event.NewHeader("ConfirmedResetPassword", 1),
+	}
+	evt.Data.UserId = request.UserId
+	evt.Data.HashedPassword = hashedPassword
 	return evt, nil
 }

@@ -11,6 +11,11 @@ type RequestedResetPasswordEvent struct {
 	Data   ResetPasswordRequest
 }
 
+type ConfirmedResetPasswordEvent struct {
+	Header event.Header
+	Data ResetPasswordRequest
+}
+
 func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
 	userId := store.GetUserId(appId, email)
 	if userId == "" {
@@ -34,18 +39,20 @@ func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedRe
 	return evt, nil
 }
 
-type ConfirmedResetPasswordEvent struct {
-	Header event.Header
-	Data ResetPasswordRequest
-}
-
 func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotStore) error {
 	request := evt.Data
 	store.SetResetPasswordRequest(request)
 	return nil
 }
 
-func ConfirmResetPassword(resetToken string, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
-	// TODO
-	return ConfirmedResetPasswordEvent{}, nil
+func ConfirmResetPassword(request ResetPasswordRequest, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
+	if store.GetUserId(request.AppId, request.Email) != request.UserId {
+		return ConfirmedResetPasswordEvent{}, ErrVerificationDenied
+	}
+
+	evt := ConfirmedResetPasswordEvent{
+		Header: event.NewHeader("ConfirmResetPassword", 1),
+		Data:   request,
+	}
+	return evt, nil
 }

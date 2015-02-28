@@ -79,7 +79,12 @@ func (self *implAuthService) RequestResetPassword(appId, email string) (resetTok
 func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword string) error {
 	store := self.processEvents()
 
-	evt, err := ConfirmResetPassword(resetToken, newPassword, store)
+	request, err := DecodeResetPasswordRequest(resetToken)
+	if err != nil {
+		return err
+	}
+
+	evt, err := ConfirmResetPassword(request, newPassword, store)
 	if err != nil {
 		return err
 	}

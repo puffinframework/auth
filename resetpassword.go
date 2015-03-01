@@ -14,10 +14,12 @@ type RequestedResetPasswordEvent struct {
 
 type ConfirmedResetPasswordEvent struct {
 	Header event.Header
-	Data   struct {
-		UserId         string
-		HashedPassword []byte
-	}
+	Data   ConfirmedResetPasswordEventData
+}
+
+type ConfirmedResetPasswordEventData struct {
+	UserId         string
+	HashedPassword []byte
 }
 
 func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {

@@ -56,6 +56,10 @@ func ConfirmResetPassword(request ResetPasswordRequest, newPassword string, stor
 		return ConfirmedResetPasswordEvent{}, ErrVerificationDenied
 	}
 
+	if store.GetResetPasswordRequest(request.UserId).UserId != request.UserId {
+		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
 	if err != nil {
 		return ConfirmedResetPasswordEvent{}, err
@@ -67,4 +71,11 @@ func ConfirmResetPassword(request ResetPasswordRequest, newPassword string, stor
 	evt.Data.UserId = request.UserId
 	evt.Data.HashedPassword = hashedPassword
 	return evt, nil
+}
+
+func OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent, store SnapshotStore) error {
+	data := evt.Data
+	store.DelResetPasswordRequest(data.UserId)
+	store.SetHashedPassword(data.UserId, data.HashedPassword)
+	return nil
 }

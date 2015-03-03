@@ -119,8 +119,8 @@ func TestResetPassword(t *testing.T) {
 	verification, err := auth.DecodeVerification(verificationToken)
 	assert.Nil(t, err)
 	resetToken = auth.EncodeResetPasswordRequest(auth.ResetPasswordRequest{
-		AppId: "app1",
-		Email: "puffin1@mailinator.com",
+		AppId: verification.AppId,
+		Email: verification.Email,
 		UserId: verification.UserId,
 		CreatedAt: time.Unix(123, 0),
 	})

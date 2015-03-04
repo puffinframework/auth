@@ -134,13 +134,13 @@ func TestResetPassword(t *testing.T) {
 	assert.Nil(t, err)
 
 	// try to confirm reset password with an invalid token
-	resetToken = auth.EncodeResetPasswordRequest(auth.ResetPasswordRequest{
+	invalidResetToken := auth.EncodeResetPasswordRequest(auth.ResetPasswordRequest{
 		AppId:     "app1",
 		Email:     "puffin1@mailinator.com",
 		UserId:    "invalid-user-id",
 		CreatedAt: time.Unix(123, 0),
 	})
-	err = authService.ConfirmResetPassword(resetToken, "newPassword")
+	err = authService.ConfirmResetPassword(invalidResetToken, "newPassword")
 	assert.Equal(t, auth.ErrResetPasswordDenied, err)
 
 	// TODO

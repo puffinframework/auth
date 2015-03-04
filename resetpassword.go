@@ -53,7 +53,7 @@ func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotSto
 
 func ConfirmResetPassword(request ResetPasswordRequest, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
 	if store.GetUserId(request.AppId, request.Email) != request.UserId {
-		return ConfirmedResetPasswordEvent{}, ErrVerificationDenied
+		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
 	}
 
 	if store.GetResetPasswordRequest(request.UserId).UserId != request.UserId {

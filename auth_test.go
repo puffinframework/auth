@@ -143,5 +143,7 @@ func TestResetPassword(t *testing.T) {
 	err = authService.ConfirmResetPassword(invalidResetToken, "newPassword")
 	assert.Equal(t, auth.ErrResetPasswordDenied, err)
 
+	// confirm reset password
+	err = authService.ConfirmResetPassword(resetToken, "newPassword")
 	// TODO
 }

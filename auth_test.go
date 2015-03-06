@@ -118,7 +118,7 @@ func TestResetPassword(t *testing.T) {
 	// try to confirm reset password without having requested first
 	verification, err := auth.DecodeVerification(verificationToken)
 	assert.Nil(t, err)
-	resetToken = auth.EncodeResetPasswordRequest(auth.ResetPasswordRequest{
+	resetToken = auth.EncodeReset(auth.Reset{
 		AppId:     verification.AppId,
 		Email:     verification.Email,
 		UserId:    verification.UserId,
@@ -130,14 +130,14 @@ func TestResetPassword(t *testing.T) {
 	// reset password
 	resetToken, err = authService.RequestResetPassword("app1", "puffin1@mailinator.com")
 	assert.Nil(t, err)
-	reset, err := auth.DecodeResetPasswordRequest(resetToken)
+	reset, err := auth.DecodeReset(resetToken)
 	assert.Nil(t, err)
 	assert.Equal(t, "app1", reset.AppId)
 	assert.Equal(t, "puffin1@mailinator.com", reset.Email)
 	assert.Equal(t, verification.UserId, reset.UserId)
 
 	// try to confirm reset password with an invalid token
-	invalidResetToken := auth.EncodeResetPasswordRequest(auth.ResetPasswordRequest{
+	invalidResetToken := auth.EncodeReset(auth.Reset{
 		AppId:     "app1",
 		Email:     "puffin1@mailinator.com",
 		UserId:    "invalid-user-id",

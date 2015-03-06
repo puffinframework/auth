@@ -9,7 +9,7 @@ import (
 
 type RequestedResetPasswordEvent struct {
 	Header event.Header
-	Data   ResetPasswordRequest
+	Data   Reset
 }
 
 type ConfirmedResetPasswordEvent struct {
@@ -35,7 +35,7 @@ func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedRe
 
 	evt := RequestedResetPasswordEvent{
 		Header: event.NewHeader("RequestedResetPassword", 1),
-		Data: ResetPasswordRequest{
+		Data: Reset{
 			AppId:     appId,
 			Email:     email,
 			UserId:    userId,
@@ -46,17 +46,17 @@ func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedRe
 }
 
 func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotStore) error {
-	request := evt.Data
-	store.SetResetPasswordRequest(request)
+	reset := evt.Data
+	store.SetReset(reset)
 	return nil
 }
 
-func ConfirmResetPassword(request ResetPasswordRequest, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
-	if store.GetUserId(request.AppId, request.Email) != request.UserId {
+func ConfirmResetPassword(reset Reset, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
+	if store.GetUserId(reset.AppId, reset.Email) != reset.UserId {
 		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
 	}
 
-	if store.GetResetPasswordRequest(request.UserId).UserId != request.UserId {
+	if store.GetReset(reset.UserId).UserId != reset.UserId {
 		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
 	}
 
@@ -68,14 +68,14 @@ func ConfirmResetPassword(request ResetPasswordRequest, newPassword string, stor
 	evt := ConfirmedResetPasswordEvent{
 		Header: event.NewHeader("ConfirmedResetPassword", 1),
 	}
-	evt.Data.UserId = request.UserId
+	evt.Data.UserId = reset.UserId
 	evt.Data.HashedPassword = hashedPassword
 	return evt, nil
 }
 
 func OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent, store SnapshotStore) error {
 	data := evt.Data
-	store.DelResetPasswordRequest(data.UserId)
+	store.DelReset(data.UserId)
 	store.SetHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }

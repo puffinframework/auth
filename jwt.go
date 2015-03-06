@@ -69,35 +69,35 @@ func DecodeVerification(verificationToken string) (Verification, error) {
 	return verification, nil
 }
 
-func EncodeResetPasswordRequest(request ResetPasswordRequest) string {
+func EncodeReset(reset Reset) string {
 	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["appId"] = request.AppId
-	token.Claims["email"] = request.Email
-	token.Claims["userId"] = request.UserId
-	token.Claims["createdAt"] = request.CreatedAt.Unix()
-	requestToken, err := token.SignedString([]byte(jwtkey))
+	token.Claims["appId"] = reset.AppId
+	token.Claims["email"] = reset.Email
+	token.Claims["userId"] = reset.UserId
+	token.Claims["createdAt"] = reset.CreatedAt.Unix()
+	resetToken, err := token.SignedString([]byte(jwtkey))
 	if err != nil {
 		log.Fatalln("[SignIn] couldn't create jwt", err)
 	}
-	return requestToken
+	return resetToken
 }
 
-func DecodeResetPasswordRequest(requestToken string) (ResetPasswordRequest, error) {
-	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
+func DecodeReset(resetToken string) (Reset, error) {
+	token, err := jwt.Parse(resetToken, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtkey), nil
 	})
 	if err != nil {
-		return ResetPasswordRequest{}, err
+		return Reset{}, err
 	}
 	if !token.Valid {
-		return ResetPasswordRequest{}, ErrJwtNotValid
+		return Reset{}, ErrJwtNotValid
 	}
 
-	request := ResetPasswordRequest{
+	reset := Reset{
 		AppId:     token.Claims["appId"].(string),
 		Email:     token.Claims["email"].(string),
 		UserId:    token.Claims["userId"].(string),
 		CreatedAt: time.Unix(int64(token.Claims["createdAt"].(float64)), 0),
 	}
-	return request, nil
+	return reset, nil
 }

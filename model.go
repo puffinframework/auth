@@ -22,7 +22,7 @@ type Verification struct {
 	Email  string
 }
 
-type ResetPasswordRequest struct {
+type Reset struct {
 	UserId    string
 	AppId     string
 	Email     string

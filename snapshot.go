@@ -18,9 +18,9 @@ type SnapshotStore interface {
 	SetHashedPassword(userId string, hashedPassword []byte)
 	SetVerification(verification Verification)
 	GetVerification(userId string) Verification
-	SetResetPasswordRequest(request ResetPasswordRequest)
-	GetResetPasswordRequest(userId string) ResetPasswordRequest
-	DelResetPasswordRequest(userId string)
+	SetReset(reset Reset)
+	GetReset(userId string) Reset
+	DelReset(userId string)
 }
 
 type implSnapshotStore struct {
@@ -33,7 +33,7 @@ type dataSnapshotStore struct {
 	UserById                     map[string]User
 	UserIdByAppIdEmail           map[string]string
 	VerificationByUserId         map[string]Verification
-	ResetPasswordRequestByUserId map[string]ResetPasswordRequest
+	ResetByUserId map[string]Reset
 }
 
 func NewSnapshotStore(store snapshot.Store) SnapshotStore {
@@ -98,14 +98,14 @@ func joinAppIdEmail(appId, email string) string {
 	return strings.Join([]string{appId, email}, "::")
 }
 
-func (self *implSnapshotStore) SetResetPasswordRequest(request ResetPasswordRequest) {
-	self.data.ResetPasswordRequestByUserId[request.UserId] = request
+func (self *implSnapshotStore) SetReset(reset Reset) {
+	self.data.ResetByUserId[reset.UserId] = reset
 }
 
-func (self *implSnapshotStore) GetResetPasswordRequest(userId string) ResetPasswordRequest {
-	return self.data.ResetPasswordRequestByUserId[userId]
+func (self *implSnapshotStore) GetReset(userId string) Reset {
+	return self.data.ResetByUserId[userId]
 }
 
-func (self *implSnapshotStore) DelResetPasswordRequest(userId string) {
-	delete(self.data.ResetPasswordRequestByUserId, userId)
+func (self *implSnapshotStore) DelReset(userId string) {
+	delete(self.data.ResetByUserId, userId)
 }

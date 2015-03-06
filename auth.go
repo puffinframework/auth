@@ -73,18 +73,18 @@ func (self *implAuthService) RequestResetPassword(appId, email string) (resetTok
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return EncodeResetPasswordRequest(evt.Data), nil
+	return EncodeReset(evt.Data), nil
 }
 
 func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword string) error {
 	store := self.processEvents()
 
-	request, err := DecodeResetPasswordRequest(resetToken)
+	reset, err := DecodeReset(resetToken)
 	if err != nil {
 		return err
 	}
 
-	evt, err := ConfirmResetPassword(request, newPassword, store)
+	evt, err := ConfirmResetPassword(reset, newPassword, store)
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (self *implAuthService) processEvents() SnapshotStore {
 			evt := VerifiedAccountEvent{Header: header, Data: data}
 			err = OnVerifiedAccount(evt, store)
 		case "RequestedResetPassword":
-			data := ResetPasswordRequest{}
+			data := Reset{}
 			self.es.MustLoadEventData(header, &data)
 			evt := RequestedResetPasswordEvent{Header: header, Data: data}
 			err = OnRequestedResetPassword(evt, store)

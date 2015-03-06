@@ -29,11 +29,11 @@ type implSnapshotStore struct {
 }
 
 type dataSnapshotStore struct {
-	LastEventDt                  time.Time
-	UserById                     map[string]User
-	UserIdByAppIdEmail           map[string]string
-	VerificationByUserId         map[string]Verification
-	ResetByUserId map[string]Reset
+	LastEventDt          time.Time
+	UserById             map[string]User
+	UserIdByAppIdEmail   map[string]string
+	VerificationByUserId map[string]Verification
+	ResetByUserId        map[string]Reset
 }
 
 func NewSnapshotStore(store snapshot.Store) SnapshotStore {

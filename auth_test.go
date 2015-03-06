@@ -103,7 +103,7 @@ func TestResetPassword(t *testing.T) {
 	assert.Equal(t, "", resetToken)
 
 	// sign up
-	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "123")
+	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "initialPassword")
 	assert.Nil(t, err)
 
 	// try to reset password before verify account

@@ -157,4 +157,8 @@ func TestResetPassword(t *testing.T) {
 	// sign in with initialPassword
 	_, err = authService.SignIn("app1", "puffin1@mailinator.com", "initialPassword")
 	assert.Equal(t, auth.ErrSignInDenied, err)
+
+	// sign in with newPassword
+	_, err = authService.SignIn("app1", "puffin1@mailinator.com", "newPassword")
+	assert.Nil(t, err)
 }

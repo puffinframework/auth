@@ -98,7 +98,7 @@ func TestResetPassword(t *testing.T) {
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
 	// try to reset password before sign up
-	resetToken, err := authService.RequestReset("app1", "puffin1@mailinator.com")
+	resetToken, err := authService.RequestResetPassword("app1", "puffin1@mailinator.com")
 	assert.Equal(t, auth.ErrResetPasswordDenied, err)
 	assert.Equal(t, "", resetToken)
 
@@ -107,7 +107,7 @@ func TestResetPassword(t *testing.T) {
 	assert.Nil(t, err)
 
 	// try to reset password before verify account
-	resetToken, err = authService.RequestReset("app1", "puffin1@mailinator.com")
+	resetToken, err = authService.RequestResetPassword("app1", "puffin1@mailinator.com")
 	assert.Equal(t, auth.ErrEmailNotVerified, err)
 	assert.Equal(t, "", resetToken)
 
@@ -124,11 +124,11 @@ func TestResetPassword(t *testing.T) {
 		UserId:    verification.UserId,
 		CreatedAt: time.Unix(123, 0),
 	})
-	err = authService.ConfirmReset(resetToken, "newPassword")
+	err = authService.ConfirmResetPassword(resetToken, "newPassword")
 	assert.Equal(t, auth.ErrResetPasswordDenied, err)
 
 	// reset password
-	resetToken, err = authService.RequestReset("app1", "puffin1@mailinator.com")
+	resetToken, err = authService.RequestResetPassword("app1", "puffin1@mailinator.com")
 	assert.Nil(t, err)
 	reset, err := auth.DecodeReset(resetToken)
 	assert.Nil(t, err)
@@ -143,11 +143,11 @@ func TestResetPassword(t *testing.T) {
 		UserId:    "invalid-user-id",
 		CreatedAt: time.Unix(123, 0),
 	})
-	err = authService.ConfirmReset(invalidResetToken, "newPassword")
+	err = authService.ConfirmResetPassword(invalidResetToken, "newPassword")
 	assert.Equal(t, auth.ErrResetPasswordDenied, err)
 
 	// confirm reset password
-	err = authService.ConfirmReset(resetToken, "newPassword")
+	err = authService.ConfirmResetPassword(resetToken, "newPassword")
 	assert.Nil(t, err)
 	// TODO
 }

@@ -22,7 +22,7 @@ type ConfirmedResetEventData struct {
 	HashedPassword []byte
 }
 
-func RequestReset(appId, email string, store SnapshotStore) (RequestedResetEvent, error) {
+func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetEvent, error) {
 	userId := store.GetUserId(appId, email)
 	if userId == "" {
 		return RequestedResetEvent{}, ErrResetPasswordDenied
@@ -51,7 +51,7 @@ func OnRequestedReset(evt RequestedResetEvent, store SnapshotStore) error {
 	return nil
 }
 
-func ConfirmReset(reset Reset, newPassword string, store SnapshotStore) (ConfirmedResetEvent, error) {
+func ConfirmResetPassword(reset Reset, newPassword string, store SnapshotStore) (ConfirmedResetEvent, error) {
 	if store.GetUserId(reset.AppId, reset.Email) != reset.UserId {
 		return ConfirmedResetEvent{}, ErrResetPasswordDenied
 	}

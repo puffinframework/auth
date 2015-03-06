@@ -9,8 +9,8 @@ type AuthService interface {
 	SignUp(appId, email, password string) (verificationToken string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
 	VerifyAccount(verificationToken string) error
-	RequestReset(appId, email string) (resetToken string, err error)
-	ConfirmReset(resetToken string, newPassword string) error
+	RequestResetPassword(appId, email string) (resetToken string, err error)
+	ConfirmResetPassword(resetToken string, newPassword string) error
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
 
@@ -64,10 +64,10 @@ func (self *implAuthService) SignIn(appId, email, password string) (sessionToken
 	return EncodeSession(evt.Data), nil
 }
 
-func (self *implAuthService) RequestReset(appId, email string) (resetToken string, err error) {
+func (self *implAuthService) RequestResetPassword(appId, email string) (resetToken string, err error) {
 	store := self.processEvents()
 
-	evt, err := RequestReset(appId, email, store)
+	evt, err := RequestResetPassword(appId, email, store)
 	if err != nil {
 		return
 	}
@@ -76,7 +76,7 @@ func (self *implAuthService) RequestReset(appId, email string) (resetToken strin
 	return EncodeReset(evt.Data), nil
 }
 
-func (self *implAuthService) ConfirmReset(resetToken string, newPassword string) error {
+func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword string) error {
 	store := self.processEvents()
 
 	reset, err := DecodeReset(resetToken)
@@ -84,7 +84,7 @@ func (self *implAuthService) ConfirmReset(resetToken string, newPassword string)
 		return err
 	}
 
-	evt, err := ConfirmReset(reset, newPassword, store)
+	evt, err := ConfirmResetPassword(reset, newPassword, store)
 	if err != nil {
 		return err
 	}

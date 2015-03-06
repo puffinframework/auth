@@ -115,6 +115,10 @@ func TestResetPassword(t *testing.T) {
 	err = authService.VerifyAccount(verificationToken)
 	assert.Nil(t, err)
 
+	// sign in with initialPassword
+	_, err = authService.SignIn("app1", "puffin1@mailinator.com", "initialPassword")
+	assert.Nil(t, err)
+
 	// try to confirm reset password without having requested first
 	verification, err := auth.DecodeVerification(verificationToken)
 	assert.Nil(t, err)

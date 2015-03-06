@@ -102,21 +102,21 @@ func (self *implAuthService) processEvents() SnapshotStore {
 		var err error
 		switch header.Type {
 		case "SignedUp":
-			user := User{}
-			self.es.MustLoadEventData(header, &user)
-			evt := SignedUpEvent{Header: header, Data: user}
+			data := User{}
+			self.es.MustLoadEventData(header, &data)
+			evt := SignedUpEvent{Header: header, Data: data}
 			err = OnSignedUp(evt, store)
 		case "VerifiedAccount":
-			verification := Verification{}
-			self.es.MustLoadEventData(header, &verification)
-			evt := VerifiedAccountEvent{Header: header, Data: verification}
+			data := Verification{}
+			self.es.MustLoadEventData(header, &data)
+			evt := VerifiedAccountEvent{Header: header, Data: data}
 			err = OnVerifiedAccount(evt, store)
-		case "RequestedResetPasswordEvent":
-			request := ResetPasswordRequest{}
-			self.es.MustLoadEventData(header, &request)
-			evt := RequestedResetPasswordEvent{Header: header, Data: request}
+		case "RequestedResetPassword":
+			data := ResetPasswordRequest{}
+			self.es.MustLoadEventData(header, &data)
+			evt := RequestedResetPasswordEvent{Header: header, Data: data}
 			err = OnRequestedResetPassword(evt, store)
-		case "ConfirmedResetPasswordEvent":
+		case "ConfirmedResetPassword":
 			data := ConfirmedResetPasswordEventData{}
 			self.es.MustLoadEventData(header, &data)
 			evt := ConfirmedResetPasswordEvent{Header: header, Data: data}

@@ -11,7 +11,7 @@ type AuthService interface {
 	VerifyAccount(verificationToken string) error
 	RequestResetPassword(appId, email string) (resetToken string, err error)
 	ConfirmResetPassword(resetToken string, newPassword string) error
-	//ChangePassword(sessionToken, oldPassword, newPassword string) error
+	ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
 
 type implAuthService struct {
@@ -91,6 +91,11 @@ func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return nil
+}
+
+func (self *implAuthService) ChangePassword(sessionToken, oldPassword, newPassword string) error {
+	return nil
+	// TODO
 }
 
 func (self *implAuthService) processEvents() SnapshotStore {

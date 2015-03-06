@@ -111,16 +111,16 @@ func (self *implAuthService) processEvents() SnapshotStore {
 			self.es.MustLoadEventData(header, &data)
 			evt := VerifiedAccountEvent{Header: header, Data: data}
 			err = OnVerifiedAccount(evt, store)
-		case "RequestedReset":
+		case "RequestedResetPassword":
 			data := Reset{}
 			self.es.MustLoadEventData(header, &data)
-			evt := RequestedResetEvent{Header: header, Data: data}
-			err = OnRequestedReset(evt, store)
-		case "ConfirmedReset":
-			data := ConfirmedResetEventData{}
+			evt := RequestedResetPasswordEvent{Header: header, Data: data}
+			err = OnRequestedResetPassword(evt, store)
+		case "ConfirmedResetPassword":
+			data := ConfirmedResetPasswordEventData{}
 			self.es.MustLoadEventData(header, &data)
-			evt := ConfirmedResetEvent{Header: header, Data: data}
-			err = OnConfirmedReset(evt, store)
+			evt := ConfirmedResetPasswordEvent{Header: header, Data: data}
+			err = OnConfirmedResetPassword(evt, store)
 		}
 		return err == nil, err
 	})

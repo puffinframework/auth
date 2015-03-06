@@ -9,8 +9,8 @@ type AuthService interface {
 	SignUp(appId, email, password string) (verificationToken string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
 	VerifyAccount(verificationToken string) error
-	RequestResetPassword(appId, email string) (resetToken string, err error)
-	ConfirmResetPassword(resetToken string, newPassword string) error
+	RequestReset(appId, email string) (resetToken string, err error)
+	ConfirmReset(resetToken string, newPassword string) error
 	//ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
 
@@ -64,10 +64,10 @@ func (self *implAuthService) SignIn(appId, email, password string) (sessionToken
 	return EncodeSession(evt.Data), nil
 }
 
-func (self *implAuthService) RequestResetPassword(appId, email string) (resetToken string, err error) {
+func (self *implAuthService) RequestReset(appId, email string) (resetToken string, err error) {
 	store := self.processEvents()
 
-	evt, err := RequestResetPassword(appId, email, store)
+	evt, err := RequestReset(appId, email, store)
 	if err != nil {
 		return
 	}
@@ -76,7 +76,7 @@ func (self *implAuthService) RequestResetPassword(appId, email string) (resetTok
 	return EncodeReset(evt.Data), nil
 }
 
-func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword string) error {
+func (self *implAuthService) ConfirmReset(resetToken string, newPassword string) error {
 	store := self.processEvents()
 
 	reset, err := DecodeReset(resetToken)
@@ -84,7 +84,7 @@ func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword
 		return err
 	}
 
-	evt, err := ConfirmResetPassword(reset, newPassword, store)
+	evt, err := ConfirmReset(reset, newPassword, store)
 	if err != nil {
 		return err
 	}
@@ -111,16 +111,16 @@ func (self *implAuthService) processEvents() SnapshotStore {
 			self.es.MustLoadEventData(header, &data)
 			evt := VerifiedAccountEvent{Header: header, Data: data}
 			err = OnVerifiedAccount(evt, store)
-		case "RequestedResetPassword":
+		case "RequestedReset":
 			data := Reset{}
 			self.es.MustLoadEventData(header, &data)
-			evt := RequestedResetPasswordEvent{Header: header, Data: data}
-			err = OnRequestedResetPassword(evt, store)
-		case "ConfirmedResetPassword":
-			data := ConfirmedResetPasswordEventData{}
+			evt := RequestedResetEvent{Header: header, Data: data}
+			err = OnRequestedReset(evt, store)
+		case "ConfirmedReset":
+			data := ConfirmedResetEventData{}
 			self.es.MustLoadEventData(header, &data)
-			evt := ConfirmedResetPasswordEvent{Header: header, Data: data}
-			err = OnConfirmedResetPassword(evt, store)
+			evt := ConfirmedResetEvent{Header: header, Data: data}
+			err = OnConfirmedReset(evt, store)
 		}
 		return err == nil, err
 	})

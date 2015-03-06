@@ -7,34 +7,34 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type RequestedResetPasswordEvent struct {
+type RequestedResetEvent struct {
 	Header event.Header
 	Data   Reset
 }
 
-type ConfirmedResetPasswordEvent struct {
+type ConfirmedResetEvent struct {
 	Header event.Header
-	Data   ConfirmedResetPasswordEventData
+	Data   ConfirmedResetEventData
 }
 
-type ConfirmedResetPasswordEventData struct {
+type ConfirmedResetEventData struct {
 	UserId         string
 	HashedPassword []byte
 }
 
-func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
+func RequestReset(appId, email string, store SnapshotStore) (RequestedResetEvent, error) {
 	userId := store.GetUserId(appId, email)
 	if userId == "" {
-		return RequestedResetPasswordEvent{}, ErrResetPasswordDenied
+		return RequestedResetEvent{}, ErrResetPasswordDenied
 	}
 
 	verification := store.GetVerification(userId)
 	if verification.AppId != appId || verification.Email != email {
-		return RequestedResetPasswordEvent{}, ErrEmailNotVerified
+		return RequestedResetEvent{}, ErrEmailNotVerified
 	}
 
-	evt := RequestedResetPasswordEvent{
-		Header: event.NewHeader("RequestedResetPassword", 1),
+	evt := RequestedResetEvent{
+		Header: event.NewHeader("RequestedReset", 1),
 		Data: Reset{
 			AppId:     appId,
 			Email:     email,
@@ -45,35 +45,35 @@ func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedRe
 	return evt, nil
 }
 
-func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotStore) error {
+func OnRequestedReset(evt RequestedResetEvent, store SnapshotStore) error {
 	reset := evt.Data
 	store.SetReset(reset)
 	return nil
 }
 
-func ConfirmResetPassword(reset Reset, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
+func ConfirmReset(reset Reset, newPassword string, store SnapshotStore) (ConfirmedResetEvent, error) {
 	if store.GetUserId(reset.AppId, reset.Email) != reset.UserId {
-		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
+		return ConfirmedResetEvent{}, ErrResetPasswordDenied
 	}
 
 	if store.GetReset(reset.UserId).UserId != reset.UserId {
-		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
+		return ConfirmedResetEvent{}, ErrResetPasswordDenied
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
 	if err != nil {
-		return ConfirmedResetPasswordEvent{}, err
+		return ConfirmedResetEvent{}, err
 	}
 
-	evt := ConfirmedResetPasswordEvent{
-		Header: event.NewHeader("ConfirmedResetPassword", 1),
+	evt := ConfirmedResetEvent{
+		Header: event.NewHeader("ConfirmedReset", 1),
 	}
 	evt.Data.UserId = reset.UserId
 	evt.Data.HashedPassword = hashedPassword
 	return evt, nil
 }
 
-func OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent, store SnapshotStore) error {
+func OnConfirmedReset(evt ConfirmedResetEvent, store SnapshotStore) error {
 	data := evt.Data
 	store.DelReset(data.UserId)
 	store.SetHashedPassword(data.UserId, data.HashedPassword)

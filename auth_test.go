@@ -162,3 +162,15 @@ func TestResetPassword(t *testing.T) {
 	_, err = authService.SignIn("app1", "puffin1@mailinator.com", "newPassword")
 	assert.Nil(t, err)
 }
+
+func TestChangePassword(t *testing.T) {
+	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
+	eventStore := event.NewLeveldbStore()
+	defer eventStore.MustDestroy()
+	snapshotStore := snapshot.NewLeveldbStore()
+	defer snapshotStore.MustDestroy()
+	authService := auth.NewAuthService(eventStore, snapshotStore)
+
+	// TODO
+}
+

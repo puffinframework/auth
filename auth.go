@@ -94,8 +94,20 @@ func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword
 }
 
 func (self *implAuthService) ChangePassword(sessionToken, oldPassword, newPassword string) error {
+	store := self.processEvents()
+
+	session, err := DecodeSession(sessionToken)
+	if err != nil {
+		return err
+	}
+
+	evt, err := ChangePassword(session, oldPassword, newPassword, store)
+	if err != nil {
+		return err
+	}
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return nil
-	// TODO
 }
 
 func (self *implAuthService) processEvents() SnapshotStore {

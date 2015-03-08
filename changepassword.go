@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"bytes"
-
 	"github.com/puffinframework/event"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,13 +15,8 @@ type ChangedPasswordEventData struct {
 }
 
 func ChangePassword(session Session, oldPassword string, newPassword string, store SnapshotStore) (ChangedPasswordEvent, error) {
-	oldHashedPassword, err := bcrypt.GenerateFromPassword([]byte(oldPassword), 10)
-	if err != nil {
-		return ChangedPasswordEvent{}, err
-	}
-
 	hashedPassword := store.GetHashedPassword(session.UserId)
-	if !bytes.Equal(hashedPassword, oldHashedPassword) {
+	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(oldPassword)); err != nil {
 		return ChangedPasswordEvent{}, ErrChangePasswordDenied
 	}
 

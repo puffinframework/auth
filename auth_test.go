@@ -171,6 +171,21 @@ func TestChangePassword(t *testing.T) {
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
+	// sign up
+	verificationToken, err := authService.SignUp("app1", "puffin1@mailinator.com", "initialPassword")
+	assert.Nil(t, err)
+
+	// verify account
+	err = authService.VerifyAccount(verificationToken)
+	assert.Nil(t, err)
+
+	// sign in
+	sessionToken, err := authService.SignIn("app1", "puffin1@mailinator.com", "initialPassword")
+	assert.Nil(t, err)
+
+	// change password
+	err = authService.ChangePassword(sessionToken, "initialPassword", "newPassword")
+	assert.Nil(t, err)
+
 	// TODO
 }
-

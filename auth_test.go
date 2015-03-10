@@ -183,6 +183,14 @@ func TestChangePassword(t *testing.T) {
 	sessionToken, err := authService.SignIn("app1", "puffin1@mailinator.com", "initialPassword")
 	assert.Nil(t, err)
 
+	// try to change password using an invalid sessionToken
+	invalidSessionToken := auth.EncodeSession(auth.Session{
+		UserId:    "invalid-user-id",
+		CreatedAt: time.Unix(123, 0),
+	})
+	err = authService.ChangePassword(invalidSessionToken, "initialPassword", "newPassword")
+	assert.Equal(t, auth.ErrChangePasswordDenied, err)
+
 	// change password
 	err = authService.ChangePassword(sessionToken, "initialPassword", "newPassword")
 	assert.Nil(t, err)

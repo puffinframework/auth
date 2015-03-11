@@ -12,4 +12,5 @@ var (
 	ErrSignInDenied         error = errors.New("AUTH-04")
 	ErrChangePasswordDenied error = errors.New("AUTH-05")
 	ErrResetPasswordDenied  error = errors.New("AUTH-06")
+	ErrSessionExpired		error = errors.New("AUTH-07")
 )

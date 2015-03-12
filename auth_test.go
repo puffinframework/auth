@@ -202,6 +202,4 @@ func TestChangePassword(t *testing.T) {
 	// sign in with wrong password
 	_, err = authService.SignIn("app1", "puffin1@mailinator.com", "initialPassword")
 	assert.Equal(t, auth.ErrSignInDenied, err)
-
-	// TODO
 }

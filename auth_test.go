@@ -1,22 +1,20 @@
 package auth_test
 
 import (
-	"os"
 	"testing"
 	"time"
 
 	"github.com/puffinframework/auth"
-	"github.com/puffinframework/config"
 	"github.com/puffinframework/event"
 	"github.com/puffinframework/snapshot"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSignUp(t *testing.T) {
-	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
-	eventStore := event.NewLeveldbStore()
+	eventStore := event.NewLeveldbStore("test-event-store")
 	defer eventStore.MustDestroy()
-	snapshotStore := snapshot.NewLeveldbStore()
+	snapshotStore := snapshot.NewLeveldbStore("test-snapshot-store")
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
@@ -34,10 +32,9 @@ func TestSignUp(t *testing.T) {
 }
 
 func TestSignIn(t *testing.T) {
-	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
-	eventStore := event.NewLeveldbStore()
+	eventStore := event.NewLeveldbStore("test-event-store")
 	defer eventStore.MustDestroy()
-	snapshotStore := snapshot.NewLeveldbStore()
+	snapshotStore := snapshot.NewLeveldbStore("test-snapshot-store")
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
@@ -90,10 +87,9 @@ func TestSignIn(t *testing.T) {
 }
 
 func TestResetPassword(t *testing.T) {
-	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
-	eventStore := event.NewLeveldbStore()
+	eventStore := event.NewLeveldbStore("test-event-store")
 	defer eventStore.MustDestroy()
-	snapshotStore := snapshot.NewLeveldbStore()
+	snapshotStore := snapshot.NewLeveldbStore("test-snapshot-store")
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 
@@ -164,10 +160,9 @@ func TestResetPassword(t *testing.T) {
 }
 
 func TestChangePassword(t *testing.T) {
-	os.Setenv(config.ENV_VAR_NAME, config.MODE_TEST)
-	eventStore := event.NewLeveldbStore()
+	eventStore := event.NewLeveldbStore("test-event-store")
 	defer eventStore.MustDestroy()
-	snapshotStore := snapshot.NewLeveldbStore()
+	snapshotStore := snapshot.NewLeveldbStore("test-snapshot-store")
 	defer snapshotStore.MustDestroy()
 	authService := auth.NewAuthService(eventStore, snapshotStore)
 

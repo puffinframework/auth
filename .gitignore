@@ -2,4 +2,3 @@
 **.swp
 test-event-store/
 test-snapshot-store/
-test.toml

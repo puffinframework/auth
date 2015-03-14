@@ -14,16 +14,16 @@ type AuthService interface {
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
 }
 
-type implAuthService struct {
+type authServiceImpl struct {
 	es event.Store
 	ss snapshot.Store
 }
 
 func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
-	return &implAuthService{es: es, ss: ss}
+	return &authServiceImpl{es: es, ss: ss}
 }
 
-func (self *implAuthService) SignUp(appId, email, password string) (verificationToken string, err error) {
+func (self *authServiceImpl) SignUp(appId, email, password string) (verificationToken string, err error) {
 	store := self.processEvents()
 
 	evt, err := SignUp(appId, email, password, store)
@@ -35,7 +35,7 @@ func (self *implAuthService) SignUp(appId, email, password string) (verification
 	return EncodeVerification(Verification{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 
-func (self *implAuthService) VerifyAccount(verificationToken string) error {
+func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
 	store := self.processEvents()
 
 	verification, err := DecodeVerification(verificationToken)
@@ -52,7 +52,7 @@ func (self *implAuthService) VerifyAccount(verificationToken string) error {
 	return nil
 }
 
-func (self *implAuthService) SignIn(appId, email, password string) (sessionToken string, err error) {
+func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
 	store := self.processEvents()
 
 	evt, err := SignIn(appId, email, password, store)
@@ -64,7 +64,7 @@ func (self *implAuthService) SignIn(appId, email, password string) (sessionToken
 	return EncodeSession(evt.Data), nil
 }
 
-func (self *implAuthService) RequestResetPassword(appId, email string) (resetToken string, err error) {
+func (self *authServiceImpl) RequestResetPassword(appId, email string) (resetToken string, err error) {
 	store := self.processEvents()
 
 	evt, err := RequestResetPassword(appId, email, store)
@@ -76,7 +76,7 @@ func (self *implAuthService) RequestResetPassword(appId, email string) (resetTok
 	return EncodeReset(evt.Data), nil
 }
 
-func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword string) error {
+func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword string) error {
 	store := self.processEvents()
 
 	reset, err := DecodeReset(resetToken)
@@ -93,7 +93,7 @@ func (self *implAuthService) ConfirmResetPassword(resetToken string, newPassword
 	return nil
 }
 
-func (self *implAuthService) ChangePassword(sessionToken, oldPassword, newPassword string) error {
+func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {
 	store := self.processEvents()
 
 	session, err := DecodeSession(sessionToken)
@@ -110,7 +110,7 @@ func (self *implAuthService) ChangePassword(sessionToken, oldPassword, newPasswo
 	return nil
 }
 
-func (self *implAuthService) processEvents() SnapshotStore {
+func (self *authServiceImpl) processEvents() SnapshotStore {
 	store := NewSnapshotStore(self.ss)
 	store.Load()
 

@@ -24,12 +24,12 @@ type Snapshot interface {
 	DelReset(userId string)
 }
 
-type implSnapshot struct {
+type snapshotImpl struct {
 	store snapshot.Store
-	data  *dataSnapshot
+	data  *snapshotData
 }
 
-type dataSnapshot struct {
+type snapshotData struct {
 	LastEventDt          time.Time
 	UserById             map[string]User
 	UserIdByAppIdEmail   map[string]string
@@ -38,9 +38,9 @@ type dataSnapshot struct {
 }
 
 func NewSnapshot(store snapshot.Store) Snapshot {
-	return &implSnapshot{
+	return &snapshotImpl{
 		store: store,
-		data: &dataSnapshot{
+		data: &snapshotData{
 			LastEventDt:          time.Unix(0, 0),
 			UserById:             make(map[string]User),
 			UserIdByAppIdEmail:   make(map[string]string),
@@ -49,49 +49,49 @@ func NewSnapshot(store snapshot.Store) Snapshot {
 	}
 }
 
-func (self *implSnapshot) Load() {
+func (self *snapshotImpl) Load() {
 	self.store.MustLoadSnapshot("AuthSnapshot", self.data)
 }
 
-func (self *implSnapshot) Save() {
+func (self *snapshotImpl) Save() {
 	self.store.MustSaveSnapshot("AuthSnapshot", self.data)
 }
 
-func (self *implSnapshot) GetLastEventDt() time.Time {
+func (self *snapshotImpl) GetLastEventDt() time.Time {
 	return self.data.LastEventDt
 }
 
-func (self *implSnapshot) SetLastEventDt(lastEventDt time.Time) {
+func (self *snapshotImpl) SetLastEventDt(lastEventDt time.Time) {
 	self.data.LastEventDt = lastEventDt
 }
 
-func (self *implSnapshot) CreateUser(user User) {
+func (self *snapshotImpl) CreateUser(user User) {
 	key := joinAppIdEmail(user.AppId, user.Email)
 	self.data.UserIdByAppIdEmail[key] = user.Id
 	self.data.UserById[user.Id] = user
 }
 
-func (self *implSnapshot) GetUserId(appId, email string) string {
+func (self *snapshotImpl) GetUserId(appId, email string) string {
 	key := joinAppIdEmail(appId, email)
 	return self.data.UserIdByAppIdEmail[key]
 }
 
-func (self *implSnapshot) GetHashedPassword(userId string) []byte {
+func (self *snapshotImpl) GetHashedPassword(userId string) []byte {
 	user := self.data.UserById[userId]
 	return user.HashedPassword
 }
 
-func (self *implSnapshot) SetHashedPassword(userId string, hashedPassword []byte) {
+func (self *snapshotImpl) SetHashedPassword(userId string, hashedPassword []byte) {
 	user := self.data.UserById[userId]
 	user.HashedPassword = hashedPassword
 	self.data.UserById[userId] = user
 }
 
-func (self *implSnapshot) SetVerification(verification Verification) {
+func (self *snapshotImpl) SetVerification(verification Verification) {
 	self.data.VerificationByUserId[verification.UserId] = verification
 }
 
-func (self *implSnapshot) GetVerification(userId string) Verification {
+func (self *snapshotImpl) GetVerification(userId string) Verification {
 	return self.data.VerificationByUserId[userId]
 }
 
@@ -99,14 +99,14 @@ func joinAppIdEmail(appId, email string) string {
 	return strings.Join([]string{appId, email}, "::")
 }
 
-func (self *implSnapshot) SetReset(reset Reset) {
+func (self *snapshotImpl) SetReset(reset Reset) {
 	self.data.ResetByUserId[reset.UserId] = reset
 }
 
-func (self *implSnapshot) GetReset(userId string) Reset {
+func (self *snapshotImpl) GetReset(userId string) Reset {
 	return self.data.ResetByUserId[userId]
 }
 
-func (self *implSnapshot) DelReset(userId string) {
+func (self *snapshotImpl) DelReset(userId string) {
 	delete(self.data.ResetByUserId, userId)
 }

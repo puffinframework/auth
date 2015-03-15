@@ -24,9 +24,9 @@ func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
 }
 
 func (self *authServiceImpl) SignUp(appId, email, password string) (verificationToken string, err error) {
-	store := self.processEvents()
+	sd := self.processEvents()
 
-	evt, err := SignUp(appId, email, password, store)
+	evt, err := SignUp(appId, email, password, sd)
 	if err != nil {
 		return
 	}
@@ -36,14 +36,14 @@ func (self *authServiceImpl) SignUp(appId, email, password string) (verification
 }
 
 func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
-	store := self.processEvents()
+	sd := self.processEvents()
 
 	verification, err := DecodeVerification(verificationToken)
 	if err != nil {
 		return err
 	}
 
-	evt, err := VerifyAccount(verification, store)
+	evt, err := VerifyAccount(verification, sd)
 	if err != nil {
 		return err
 	}
@@ -53,9 +53,9 @@ func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
 }
 
 func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
-	store := self.processEvents()
+	sd := self.processEvents()
 
-	evt, err := SignIn(appId, email, password, store)
+	evt, err := SignIn(appId, email, password, sd)
 	if err != nil {
 		return sessionToken, err
 	}
@@ -65,9 +65,9 @@ func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken
 }
 
 func (self *authServiceImpl) RequestResetPassword(appId, email string) (resetToken string, err error) {
-	store := self.processEvents()
+	sd := self.processEvents()
 
-	evt, err := RequestResetPassword(appId, email, store)
+	evt, err := RequestResetPassword(appId, email, sd)
 	if err != nil {
 		return
 	}
@@ -77,14 +77,14 @@ func (self *authServiceImpl) RequestResetPassword(appId, email string) (resetTok
 }
 
 func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword string) error {
-	store := self.processEvents()
+	sd := self.processEvents()
 
 	reset, err := DecodeReset(resetToken)
 	if err != nil {
 		return err
 	}
 
-	evt, err := ConfirmResetPassword(reset, newPassword, store)
+	evt, err := ConfirmResetPassword(reset, newPassword, sd)
 	if err != nil {
 		return err
 	}
@@ -94,14 +94,14 @@ func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword
 }
 
 func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {
-	store := self.processEvents()
+	sd := self.processEvents()
 
 	session, err := DecodeSession(sessionToken)
 	if err != nil {
 		return err
 	}
 
-	evt, err := ChangePassword(session, oldPassword, newPassword, store)
+	evt, err := ChangePassword(session, oldPassword, newPassword, sd)
 	if err != nil {
 		return err
 	}

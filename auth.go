@@ -111,8 +111,8 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 }
 
 func (self *authServiceImpl) processEvents() Snapshot {
-	sn := NewSnapshot(self.ss)
-	sn.Load()
+	sn := NewSnapshot()
+	sn.LoadFrom(self.ss)
 
 	self.es.ForEachEventHeader(sn.GetLastEventDt(), func(header event.Header) (bool, error) {
 		sn.SetLastEventDt(header.CreatedAt)
@@ -147,17 +147,17 @@ func (self *authServiceImpl) processEvents() Snapshot {
 		return err == nil, err
 	})
 
-	sn.Save()
+	sn.SaveTo(self.ss)
 	return sn
 }
 
-func ProcessEvents(sn snapshot.Snapshot, es event.Store, callback func(header event.Header) (bool, error)) {
-	sn.Load()
+func ProcessEvents(sn snapshot.Data, ss snapshot.Store, es event.Store, callback func(header event.Header) (bool, error)) {
+	sn.LoadFrom(ss)
 
 	es.ForEachEventHeader(sn.GetLastEventDt(), func(header event.Header) (bool, error) {
 		sn.SetLastEventDt(header.CreatedAt)
 		return callback(header)
 	})
 
-	sn.Save()
+	sn.SaveTo(ss)
 }

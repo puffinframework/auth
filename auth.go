@@ -110,45 +110,45 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 	return nil
 }
 
-func (self *authServiceImpl) processEvents() SnapshotStore {
-	store := NewSnapshotStore(self.ss)
-	store.Load()
+func (self *authServiceImpl) processEvents() Snapshot {
+	sn := NewSnapshot(self.ss)
+	sn.Load()
 
-	self.es.ForEachEventHeader(store.GetLastEventDt(), func(header event.Header) (bool, error) {
-		store.SetLastEventDt(header.CreatedAt)
+	self.es.ForEachEventHeader(sn.GetLastEventDt(), func(header event.Header) (bool, error) {
+		sn.SetLastEventDt(header.CreatedAt)
 		var err error
 		switch header.Type {
 		case "SignedUp":
 			data := User{}
 			self.es.MustLoadEventData(header, &data)
 			evt := SignedUpEvent{Header: header, Data: data}
-			err = OnSignedUp(evt, store)
+			err = OnSignedUp(evt, sn)
 		case "VerifiedAccount":
 			data := Verification{}
 			self.es.MustLoadEventData(header, &data)
 			evt := VerifiedAccountEvent{Header: header, Data: data}
-			err = OnVerifiedAccount(evt, store)
+			err = OnVerifiedAccount(evt, sn)
 		case "RequestedResetPassword":
 			data := Reset{}
 			self.es.MustLoadEventData(header, &data)
 			evt := RequestedResetPasswordEvent{Header: header, Data: data}
-			err = OnRequestedResetPassword(evt, store)
+			err = OnRequestedResetPassword(evt, sn)
 		case "ConfirmedResetPassword":
 			data := ConfirmedResetPasswordEventData{}
 			self.es.MustLoadEventData(header, &data)
 			evt := ConfirmedResetPasswordEvent{Header: header, Data: data}
-			err = OnConfirmedResetPassword(evt, store)
+			err = OnConfirmedResetPassword(evt, sn)
 		case "ChangedPassword":
 			data := ChangedPasswordEventData{}
 			self.es.MustLoadEventData(header, &data)
 			evt := ChangedPasswordEvent{Header: header, Data: data}
-			err = OnChangedPassword(evt, store)
+			err = OnChangedPassword(evt, sn)
 		}
 		return err == nil, err
 	})
 
-	store.Save()
-	return store
+	sn.Save()
+	return sn
 }
 
 func ProcessEvents(sn snapshot.Snapshot, es event.Store, callback func(header event.Header) (bool, error)) {

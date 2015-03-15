@@ -22,13 +22,13 @@ type ConfirmedResetPasswordEventData struct {
 	HashedPassword []byte
 }
 
-func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedResetPasswordEvent, error) {
-	userId := store.GetUserId(appId, email)
+func RequestResetPassword(appId, email string, sn Snapshot) (RequestedResetPasswordEvent, error) {
+	userId := sn.GetUserId(appId, email)
 	if userId == "" {
 		return RequestedResetPasswordEvent{}, ErrResetPasswordDenied
 	}
 
-	verification := store.GetVerification(userId)
+	verification := sn.GetVerification(userId)
 	if verification.AppId != appId || verification.Email != email {
 		return RequestedResetPasswordEvent{}, ErrEmailNotVerified
 	}
@@ -45,18 +45,18 @@ func RequestResetPassword(appId, email string, store SnapshotStore) (RequestedRe
 	return evt, nil
 }
 
-func OnRequestedResetPassword(evt RequestedResetPasswordEvent, store SnapshotStore) error {
+func OnRequestedResetPassword(evt RequestedResetPasswordEvent, sn Snapshot) error {
 	reset := evt.Data
-	store.SetReset(reset)
+	sn.SetReset(reset)
 	return nil
 }
 
-func ConfirmResetPassword(reset Reset, newPassword string, store SnapshotStore) (ConfirmedResetPasswordEvent, error) {
-	if store.GetUserId(reset.AppId, reset.Email) != reset.UserId {
+func ConfirmResetPassword(reset Reset, newPassword string, sn Snapshot) (ConfirmedResetPasswordEvent, error) {
+	if sn.GetUserId(reset.AppId, reset.Email) != reset.UserId {
 		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
 	}
 
-	if store.GetReset(reset.UserId).UserId != reset.UserId {
+	if sn.GetReset(reset.UserId).UserId != reset.UserId {
 		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
 	}
 
@@ -73,9 +73,9 @@ func ConfirmResetPassword(reset Reset, newPassword string, store SnapshotStore) 
 	return evt, nil
 }
 
-func OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent, store SnapshotStore) error {
+func OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent, sn Snapshot) error {
 	data := evt.Data
-	store.DelReset(data.UserId)
-	store.SetHashedPassword(data.UserId, data.HashedPassword)
+	sn.DelReset(data.UserId)
+	sn.SetHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }

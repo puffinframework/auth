@@ -7,7 +7,7 @@ import (
 	"github.com/puffinframework/snapshot"
 )
 
-type SnapshotStore interface {
+type Snapshot interface {
 	Load()
 	Save()
 	GetLastEventDt() time.Time
@@ -24,12 +24,12 @@ type SnapshotStore interface {
 	DelReset(userId string)
 }
 
-type implSnapshotStore struct {
+type implSnapshot struct {
 	store snapshot.Store
-	data  *dataSnapshotStore
+	data  *dataSnapshot
 }
 
-type dataSnapshotStore struct {
+type dataSnapshot struct {
 	LastEventDt          time.Time
 	UserById             map[string]User
 	UserIdByAppIdEmail   map[string]string
@@ -37,10 +37,10 @@ type dataSnapshotStore struct {
 	ResetByUserId        map[string]Reset
 }
 
-func NewSnapshotStore(store snapshot.Store) SnapshotStore {
-	return &implSnapshotStore{
+func NewSnapshot(store snapshot.Store) Snapshot {
+	return &implSnapshot{
 		store: store,
-		data: &dataSnapshotStore{
+		data: &dataSnapshot{
 			LastEventDt:          time.Unix(0, 0),
 			UserById:             make(map[string]User),
 			UserIdByAppIdEmail:   make(map[string]string),
@@ -49,49 +49,49 @@ func NewSnapshotStore(store snapshot.Store) SnapshotStore {
 	}
 }
 
-func (self *implSnapshotStore) Load() {
+func (self *implSnapshot) Load() {
 	self.store.MustLoadSnapshot("AuthSnapshot", self.data)
 }
 
-func (self *implSnapshotStore) Save() {
+func (self *implSnapshot) Save() {
 	self.store.MustSaveSnapshot("AuthSnapshot", self.data)
 }
 
-func (self *implSnapshotStore) GetLastEventDt() time.Time {
+func (self *implSnapshot) GetLastEventDt() time.Time {
 	return self.data.LastEventDt
 }
 
-func (self *implSnapshotStore) SetLastEventDt(lastEventDt time.Time) {
+func (self *implSnapshot) SetLastEventDt(lastEventDt time.Time) {
 	self.data.LastEventDt = lastEventDt
 }
 
-func (self *implSnapshotStore) CreateUser(user User) {
+func (self *implSnapshot) CreateUser(user User) {
 	key := joinAppIdEmail(user.AppId, user.Email)
 	self.data.UserIdByAppIdEmail[key] = user.Id
 	self.data.UserById[user.Id] = user
 }
 
-func (self *implSnapshotStore) GetUserId(appId, email string) string {
+func (self *implSnapshot) GetUserId(appId, email string) string {
 	key := joinAppIdEmail(appId, email)
 	return self.data.UserIdByAppIdEmail[key]
 }
 
-func (self *implSnapshotStore) GetHashedPassword(userId string) []byte {
+func (self *implSnapshot) GetHashedPassword(userId string) []byte {
 	user := self.data.UserById[userId]
 	return user.HashedPassword
 }
 
-func (self *implSnapshotStore) SetHashedPassword(userId string, hashedPassword []byte) {
+func (self *implSnapshot) SetHashedPassword(userId string, hashedPassword []byte) {
 	user := self.data.UserById[userId]
 	user.HashedPassword = hashedPassword
 	self.data.UserById[userId] = user
 }
 
-func (self *implSnapshotStore) SetVerification(verification Verification) {
+func (self *implSnapshot) SetVerification(verification Verification) {
 	self.data.VerificationByUserId[verification.UserId] = verification
 }
 
-func (self *implSnapshotStore) GetVerification(userId string) Verification {
+func (self *implSnapshot) GetVerification(userId string) Verification {
 	return self.data.VerificationByUserId[userId]
 }
 
@@ -99,14 +99,14 @@ func joinAppIdEmail(appId, email string) string {
 	return strings.Join([]string{appId, email}, "::")
 }
 
-func (self *implSnapshotStore) SetReset(reset Reset) {
+func (self *implSnapshot) SetReset(reset Reset) {
 	self.data.ResetByUserId[reset.UserId] = reset
 }
 
-func (self *implSnapshotStore) GetReset(userId string) Reset {
+func (self *implSnapshot) GetReset(userId string) Reset {
 	return self.data.ResetByUserId[userId]
 }
 
-func (self *implSnapshotStore) DelReset(userId string) {
+func (self *implSnapshot) DelReset(userId string) {
 	delete(self.data.ResetByUserId, userId)
 }

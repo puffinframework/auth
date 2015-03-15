@@ -9,8 +9,8 @@ type VerifiedAccountEvent struct {
 	Data   Verification
 }
 
-func VerifyAccount(verification Verification, sn Snapshot) (VerifiedAccountEvent, error) {
-	if sn.GetUserId(verification.AppId, verification.Email) != verification.UserId {
+func VerifyAccount(verification Verification, sd SnapshotData) (VerifiedAccountEvent, error) {
+	if sd.GetUserId(verification.AppId, verification.Email) != verification.UserId {
 		return VerifiedAccountEvent{}, ErrVerificationDenied
 	}
 
@@ -21,8 +21,8 @@ func VerifyAccount(verification Verification, sn Snapshot) (VerifiedAccountEvent
 	return evt, nil
 }
 
-func OnVerifiedAccount(evt VerifiedAccountEvent, sn Snapshot) error {
+func OnVerifiedAccount(evt VerifiedAccountEvent, sd SnapshotData) error {
 	verification := evt.Data
-	sn.SetVerification(verification)
+	sd.SetVerification(verification)
 	return nil
 }

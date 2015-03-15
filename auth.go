@@ -110,54 +110,54 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 	return nil
 }
 
-func (self *authServiceImpl) processEvents() Snapshot {
-	sn := NewSnapshot()
-	sn.LoadFrom(self.ss)
+func (self *authServiceImpl) processEvents() SnapshotData {
+	sd := NewSnapshotData()
+	sd.LoadFrom(self.ss)
 
-	self.es.ForEachEventHeader(sn.GetLastEventDt(), func(header event.Header) (bool, error) {
-		sn.SetLastEventDt(header.CreatedAt)
+	self.es.ForEachEventHeader(sd.GetLastEventDt(), func(header event.Header) (bool, error) {
+		sd.SetLastEventDt(header.CreatedAt)
 		var err error
 		switch header.Type {
 		case "SignedUp":
 			data := User{}
 			self.es.MustLoadEventData(header, &data)
 			evt := SignedUpEvent{Header: header, Data: data}
-			err = OnSignedUp(evt, sn)
+			err = OnSignedUp(evt, sd)
 		case "VerifiedAccount":
 			data := Verification{}
 			self.es.MustLoadEventData(header, &data)
 			evt := VerifiedAccountEvent{Header: header, Data: data}
-			err = OnVerifiedAccount(evt, sn)
+			err = OnVerifiedAccount(evt, sd)
 		case "RequestedResetPassword":
 			data := Reset{}
 			self.es.MustLoadEventData(header, &data)
 			evt := RequestedResetPasswordEvent{Header: header, Data: data}
-			err = OnRequestedResetPassword(evt, sn)
+			err = OnRequestedResetPassword(evt, sd)
 		case "ConfirmedResetPassword":
 			data := ConfirmedResetPasswordEventData{}
 			self.es.MustLoadEventData(header, &data)
 			evt := ConfirmedResetPasswordEvent{Header: header, Data: data}
-			err = OnConfirmedResetPassword(evt, sn)
+			err = OnConfirmedResetPassword(evt, sd)
 		case "ChangedPassword":
 			data := ChangedPasswordEventData{}
 			self.es.MustLoadEventData(header, &data)
 			evt := ChangedPasswordEvent{Header: header, Data: data}
-			err = OnChangedPassword(evt, sn)
+			err = OnChangedPassword(evt, sd)
 		}
 		return err == nil, err
 	})
 
-	sn.SaveTo(self.ss)
-	return sn
+	sd.SaveTo(self.ss)
+	return sd
 }
 
-func ProcessEvents(sn snapshot.Data, ss snapshot.Store, es event.Store, callback func(header event.Header) (bool, error)) {
-	sn.LoadFrom(ss)
+func ProcessEvents(sd snapshot.Data, ss snapshot.Store, es event.Store, callback func(header event.Header) (bool, error)) {
+	sd.LoadFrom(ss)
 
-	es.ForEachEventHeader(sn.GetLastEventDt(), func(header event.Header) (bool, error) {
-		sn.SetLastEventDt(header.CreatedAt)
+	es.ForEachEventHeader(sd.GetLastEventDt(), func(header event.Header) (bool, error) {
+		sd.SetLastEventDt(header.CreatedAt)
 		return callback(header)
 	})
 
-	sn.SaveTo(ss)
+	sd.SaveTo(ss)
 }

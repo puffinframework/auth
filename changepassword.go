@@ -14,8 +14,8 @@ type ChangedPasswordEventData struct {
 	HashedPassword []byte
 }
 
-func ChangePassword(session Session, oldPassword string, newPassword string, sn Snapshot) (ChangedPasswordEvent, error) {
-	hashedPassword := sn.GetHashedPassword(session.UserId)
+func ChangePassword(session Session, oldPassword string, newPassword string, sd SnapshotData) (ChangedPasswordEvent, error) {
+	hashedPassword := sd.GetHashedPassword(session.UserId)
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(oldPassword)); err != nil {
 		return ChangedPasswordEvent{}, ErrChangePasswordDenied
 	}
@@ -33,8 +33,8 @@ func ChangePassword(session Session, oldPassword string, newPassword string, sn 
 	return evt, nil
 }
 
-func OnChangedPassword(evt ChangedPasswordEvent, sn Snapshot) error {
+func OnChangedPassword(evt ChangedPasswordEvent, sd SnapshotData) error {
 	data := evt.Data
-	sn.SetHashedPassword(data.UserId, data.HashedPassword)
+	sd.SetHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }

@@ -12,6 +12,7 @@ type SnapshotStore interface {
 	Save()
 	GetLastEventDt() time.Time
 	SetLastEventDt(lastEventDt time.Time)
+
 	CreateUser(user User)
 	GetUserId(appId, email string) string
 	GetHashedPassword(userId string) []byte

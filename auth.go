@@ -150,3 +150,14 @@ func (self *authServiceImpl) processEvents() SnapshotStore {
 	store.Save()
 	return store
 }
+
+func ProcessEvents(sn snapshot.Snapshot, es event.Store, callback func(header event.Header) (bool, error)) {
+	sn.Load()
+
+	es.ForEachEventHeader(sn.GetLastEventDt(), func(header event.Header) (bool, error) {
+		sn.SetLastEventDt(header.CreatedAt)
+		return callback(header)
+	})
+
+	sn.Save()
+}

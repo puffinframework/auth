@@ -8,11 +8,6 @@ import (
 )
 
 type SnapshotData interface {
-	LoadFrom(ss snapshot.Store)
-	SaveTo(ss snapshot.Store)
-	GetLastEventDt() time.Time
-	SetLastEventDt(lastEventDt time.Time)
-
 	CreateUser(user User)
 	GetUserId(appId, email string) string
 	GetHashedPassword(userId string) []byte

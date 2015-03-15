@@ -119,29 +119,24 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 		var err error
 		switch header.Type {
 		case "SignedUp":
-			data := User{}
-			self.es.MustLoadEventData(header, &data)
-			evt := SignedUpEvent{Header: header, Data: data}
+			evt := SignedUpEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
 			err = OnSignedUp(evt, sd)
 		case "VerifiedAccount":
-			data := Verification{}
-			self.es.MustLoadEventData(header, &data)
-			evt := VerifiedAccountEvent{Header: header, Data: data}
+			evt := VerifiedAccountEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
 			err = OnVerifiedAccount(evt, sd)
 		case "RequestedResetPassword":
-			data := Reset{}
-			self.es.MustLoadEventData(header, &data)
-			evt := RequestedResetPasswordEvent{Header: header, Data: data}
+			evt := RequestedResetPasswordEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
 			err = OnRequestedResetPassword(evt, sd)
 		case "ConfirmedResetPassword":
-			data := ConfirmedResetPasswordEventData{}
-			self.es.MustLoadEventData(header, &data)
-			evt := ConfirmedResetPasswordEvent{Header: header, Data: data}
+			evt := ConfirmedResetPasswordEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
 			err = OnConfirmedResetPassword(evt, sd)
 		case "ChangedPassword":
-			data := ChangedPasswordEventData{}
-			self.es.MustLoadEventData(header, &data)
-			evt := ChangedPasswordEvent{Header: header, Data: data}
+			evt := ChangedPasswordEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
 			err = OnChangedPassword(evt, sd)
 		}
 		return err == nil, err

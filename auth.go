@@ -112,7 +112,10 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 
 func (self *authServiceImpl) processEvents() SnapshotData {
 	sd := NewSnapshotData()
-	ProcessEvents(sd.(snapshot.Data), self.ss, self.es, func(header event.Header) (bool, error) {
+	sd.(snapshot.Data).LoadFrom(self.ss)
+
+	self.es.ForEachEventHeader(sd.(snapshot.Data).GetLastEventDt(), func(header event.Header) (bool, error) {
+		sd.(snapshot.Data).SetLastEventDt(header.CreatedAt)
 		var err error
 		switch header.Type {
 		case "SignedUp":
@@ -139,16 +142,6 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 		return err == nil, err
 	})
 
+	sd.(snapshot.Data).SaveTo(self.ss)
 	return sd
-}
-
-func ProcessEvents(sd snapshot.Data, ss snapshot.Store, es event.Store, callback func(header event.Header) (bool, error)) {
-	sd.LoadFrom(ss)
-
-	es.ForEachEventHeader(sd.GetLastEventDt(), func(header event.Header) (bool, error) {
-		sd.SetLastEventDt(header.CreatedAt)
-		return callback(header)
-	})
-
-	sd.SaveTo(ss)
 }

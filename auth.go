@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"log"
+
 	"github.com/puffinframework/event"
 	"github.com/puffinframework/snapshot"
 )
@@ -112,9 +114,16 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 
 func (self *authServiceImpl) processEvents() SnapshotData {
 	sd := NewSnapshotData()
-	sd.(snapshot.Data).LoadFrom(self.ss)
+	if err := sd.(snapshot.Data).LoadFrom(self.ss); err != nil {
+		log.Panic(err)
+	}
 
-	self.es.ForEachEventHeader(sd.(snapshot.Data).GetLastEventDt(), func(header event.Header) (bool, error) {
+	lastEventDt, err := sd.(snapshot.Data).GetLastEventDt()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	self.es.ForEachEventHeader(lastEventDt, func(header event.Header) (bool, error) {
 		sd.(snapshot.Data).SetLastEventDt(header.CreatedAt)
 		var err error
 		switch header.Type {

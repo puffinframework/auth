@@ -36,20 +36,23 @@ func NewSnapshotData() SnapshotData {
 	}
 }
 
-func (self *snapshotDataImpl) LoadFrom(ss snapshot.Store) {
+func (self *snapshotDataImpl) LoadFrom(ss snapshot.Store) error {
 	ss.MustLoadSnapshot("AuthSnapshot", self)
+	return nil
 }
 
-func (self *snapshotDataImpl) SaveTo(ss snapshot.Store) {
+func (self *snapshotDataImpl) SaveTo(ss snapshot.Store) error {
 	ss.MustSaveSnapshot("AuthSnapshot", self)
+	return nil
 }
 
-func (self *snapshotDataImpl) GetLastEventDt() time.Time {
-	return self.LastEventDt
+func (self *snapshotDataImpl) GetLastEventDt() (time.Time, error) {
+	return self.LastEventDt, nil
 }
 
-func (self *snapshotDataImpl) SetLastEventDt(lastEventDt time.Time) {
+func (self *snapshotDataImpl) SetLastEventDt(lastEventDt time.Time) error {
 	self.LastEventDt = lastEventDt
+	return nil
 }
 
 func (self *snapshotDataImpl) CreateUser(user User) {

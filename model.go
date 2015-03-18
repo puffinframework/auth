@@ -28,3 +28,9 @@ type Reset struct {
 	Email     string
 	CreatedAt time.Time
 }
+
+type Authorization struct {
+	AuthorizationId string
+	UserId          string
+	IsAuthorized    bool
+}

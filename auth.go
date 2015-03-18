@@ -14,6 +14,7 @@ type AuthService interface {
 	RequestResetPassword(appId, email string) (resetToken string, err error)
 	ConfirmResetPassword(resetToken string, newPassword string) error
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
+	SetAuthorizations(userIds []string, authorizationIds []string, IsAuthorized bool) error
 }
 
 type authServiceImpl struct {
@@ -109,6 +110,11 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
+}
+
+func (self *authServiceImpl) SetAuthorizations(userIds []string, authorizationIds []string, IsAuthorized bool) error {
+	// TODO
 	return nil
 }
 

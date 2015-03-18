@@ -114,6 +114,7 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 
 func (self *authServiceImpl) processEvents() SnapshotData {
 	sd := NewSnapshotData()
+
 	if err := sd.(snapshot.Data).LoadFrom(self.ss); err != nil {
 		log.Panic(err)
 	}
@@ -123,7 +124,7 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 		log.Panic(err)
 	}
 
-	self.es.ForEachEventHeader(lastEventDt, func(header event.Header) (bool, error) {
+	err = self.es.ForEachEventHeader(lastEventDt, func(header event.Header) (bool, error) {
 		sd.(snapshot.Data).SetLastEventDt(header.CreatedAt)
 		var err error
 		switch header.Type {
@@ -150,7 +151,13 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 		}
 		return err == nil, err
 	})
+	if err != nil {
+		log.Panic(err)
+	}
 
-	sd.(snapshot.Data).SaveTo(self.ss)
+	if err = sd.(snapshot.Data).SaveTo(self.ss); err != nil {
+		log.Panic(err)
+	}
+
 	return sd
 }

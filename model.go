@@ -29,7 +29,7 @@ type Reset struct {
 	CreatedAt time.Time
 }
 
-type Authorization struct {
+type UserAuthorization struct {
 	AuthorizationId string
 	UserId          string
 	IsAuthorized    bool

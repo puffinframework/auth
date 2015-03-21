@@ -14,7 +14,7 @@ type AuthService interface {
 	RequestResetPassword(appId, email string) (resetToken string, err error)
 	ConfirmResetPassword(resetToken string, newPassword string) error
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
-	//CreateSuperUser(email, password string) error
+	//CreateSuperUser(authToken, email, password string) error
 	SetAuthorizations(sessionToken string, userIds []string, authorizationIds []string, IsAuthorized bool) error
 }
 

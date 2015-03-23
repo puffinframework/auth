@@ -16,10 +16,10 @@ type AuthService interface {
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
 	//CreateSuperUser(email, password string) error
 	SetAuthorizations(sessionToken string, userIds []string, authorizationIds []string, IsAuthorized bool) error
-	//CreateUser(sessionToken, appId, email, password string) error
-	//ChangeUserPassword(sessionToken, userId, newPassword string) error
-	//ChangeUserEmail(sessionToken, userId, newEmail string) error
-	//RemoveUser(sessionToken, userId error) error
+	CreateUser(sessionToken, appId, email, password string) error
+	ChangeUserPassword(sessionToken, userId, newPassword string) error
+	ChangeUserEmail(sessionToken, userId, newEmail string) error
+	RemoveUser(sessionToken, userId error) error
 }
 
 type authServiceImpl struct {
@@ -119,6 +119,26 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 }
 
 func (self *authServiceImpl) SetAuthorizations(sessionToken string, userIds []string, authorizationIds []string, IsAuthorized bool) error {
+	// TODO
+	return nil
+}
+
+func (self *authServiceImpl) CreateUser(sessionToken, appId, email, password string) error {
+	// TODO
+	return nil
+}
+
+func (self *authServiceImpl) ChangeUserPassword(sessionToken, userId, newPassword string) error {
+	// TODO
+	return nil
+}
+
+func (self *authServiceImpl) ChangeUserEmail(sessionToken, userId, newEmail string) error {
+	// TODO
+	return nil
+}
+
+func (self *authServiceImpl) RemoveUser(sessionToken, userId error) error {
 	// TODO
 	return nil
 }

@@ -13,13 +13,14 @@ type AuthService interface {
 	VerifyAccount(verificationToken string) error
 	RequestResetPassword(appId, email string) (resetToken string, err error)
 	ConfirmResetPassword(resetToken string, newPassword string) error
+	//ChangeEmail(sessionToken, userId, newEmail string) error
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
 	//CreateSuperUser(email, password string) error
-	SetAuthorizations(sessionToken string, userIds []string, authorizationIds []string, IsAuthorized bool) error
-	CreateUser(sessionToken, appId, email, password string) error
-	ChangeUserPassword(sessionToken, userId, newPassword string) error
-	ChangeUserEmail(sessionToken, userId, newEmail string) error
-	RemoveUser(sessionToken, userId error) error
+	CreateUser(authorizationId, sessionToken, appId, email, password string) error
+	ChangeUserPassword(authorizationId, sessionToken, userId, newPassword string) error
+	ChangeUserEmail(authorizationId, sessionToken, userId, newEmail string) error
+	RemoveUser(authorizationId, sessionToken, userId error) error
+	SetAuthorizations(authorizationId, sessionToken string, userIds []string, authorizationIds []string, IsAuthorized bool) error
 }
 
 type authServiceImpl struct {
@@ -118,27 +119,27 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 	return nil
 }
 
-func (self *authServiceImpl) SetAuthorizations(sessionToken string, userIds []string, authorizationIds []string, IsAuthorized bool) error {
+func (self *authServiceImpl) CreateUser(authorizationId, sessionToken, appId, email, password string) error {
 	// TODO
 	return nil
 }
 
-func (self *authServiceImpl) CreateUser(sessionToken, appId, email, password string) error {
+func (self *authServiceImpl) ChangeUserPassword(authorizationId, sessionToken, userId, newPassword string) error {
 	// TODO
 	return nil
 }
 
-func (self *authServiceImpl) ChangeUserPassword(sessionToken, userId, newPassword string) error {
+func (self *authServiceImpl) ChangeUserEmail(authorizationId, sessionToken, userId, newEmail string) error {
 	// TODO
 	return nil
 }
 
-func (self *authServiceImpl) ChangeUserEmail(sessionToken, userId, newEmail string) error {
+func (self *authServiceImpl) RemoveUser(authorizationId, sessionToken, userId error) error {
 	// TODO
 	return nil
 }
 
-func (self *authServiceImpl) RemoveUser(sessionToken, userId error) error {
+func (self *authServiceImpl) SetAuthorizations(authorizationId, sessionToken string, userIds []string, authorizationIds []string, IsAuthorized bool) error {
 	// TODO
 	return nil
 }

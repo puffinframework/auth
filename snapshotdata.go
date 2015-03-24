@@ -17,10 +17,12 @@ type SnapshotData interface {
 	SetReset(reset Reset)
 	GetReset(userId string) Reset
 	DelReset(userId string)
+	IsSuperUser(userId string) bool
 }
 
 type snapshotDataImpl struct {
 	LastEventDt          time.Time
+	SuperUserById        map[string]SuperUser
 	UserById             map[string]User
 	UserIdByAppIdEmail   map[string]string
 	VerificationByUserId map[string]Verification
@@ -99,4 +101,9 @@ func (self *snapshotDataImpl) GetReset(userId string) Reset {
 
 func (self *snapshotDataImpl) DelReset(userId string) {
 	delete(self.ResetByUserId, userId)
+}
+
+func (self *snapshotDataImpl) IsSuperUser(userId string) bool {
+	superUser := self.SuperUserById[userId]
+	return superUser.Id != ""
 }

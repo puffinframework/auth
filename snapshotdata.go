@@ -18,17 +18,17 @@ type SnapshotData interface {
 	GetReset(userId string) Reset
 	DelReset(userId string)
 	IsSuperUser(userId string) bool
-	IsAuthorized(userId, authorizationId string) bool
+	GetAuthorization(userId, authorizationId string) UserAuthorization
 }
 
 type snapshotDataImpl struct {
-	LastEventDt          time.Time
-	SuperUserById        map[string]SuperUser
-	UserById             map[string]User
-	UserIdByAppIdEmail   map[string]string
-	VerificationByUserId map[string]Verification
-	ResetByUserId        map[string]Reset
-	IsAuthorizedByKey    map[string]bool
+	LastEventDt            time.Time
+	SuperUserById          map[string]SuperUser
+	UserById               map[string]User
+	UserIdByAppIdEmail     map[string]string
+	VerificationByUserId   map[string]Verification
+	ResetByUserId          map[string]Reset
+	UserAuthorizationByKey map[string]UserAuthorization
 }
 
 func NewSnapshotData() SnapshotData {
@@ -110,9 +110,9 @@ func (self *snapshotDataImpl) IsSuperUser(userId string) bool {
 	return superUser.Id != ""
 }
 
-func (self *snapshotDataImpl) IsAuthorized(userId, authorizationId string) bool {
+func (self *snapshotDataImpl) GetAuthorization(userId, authorizationId string) UserAuthorization {
 	key := getAuthorizationKey(userId, authorizationId)
-	return self.IsAuthorizedByKey[key]
+	return self.UserAuthorizationByKey[key]
 }
 
 func getAuthorizationKey(userId, authorizationId string) string {

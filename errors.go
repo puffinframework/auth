@@ -15,4 +15,5 @@ var (
 	ErrChangePasswordDenied error = errors.New("AUTH-07")
 	ErrResetPasswordDenied  error = errors.New("AUTH-08")
 	ErrResetPasswordExpired error = errors.New("AUTH-09")
+	ErrNotAuthorized        error = errors.New("AUTH-10")
 )

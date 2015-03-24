@@ -13,7 +13,11 @@ type CreatedUserEvent struct {
 }
 
 func CreateUser(session Session, authorizationId, appId, email, password string, sd SnapshotData) (CreatedUserEvent, error) {
-	// TODO check authorization
+	if !sd.IsSuperUser(session.UserId) {
+		if !sd.IsAuthorized(session.UserId, authorizationId) {
+			return CreatedUserEvent{}, ErrNotAuthorized
+		}
+	}
 
 	if sd.GetUserId(appId, email) != "" {
 		return CreatedUserEvent{}, ErrEmailAlreadyUsed

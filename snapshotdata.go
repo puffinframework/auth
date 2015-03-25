@@ -18,7 +18,7 @@ type SnapshotData interface {
 	GetReset(userId string) Reset
 	DelReset(userId string)
 	IsSuperUser(userId string) bool
-	GetAuthorization(userId, authorizationId string) UserAuthorization
+	GetUserAuthorization(userId, authorizationId string) UserAuthorization
 }
 
 type snapshotDataImpl struct {
@@ -110,11 +110,11 @@ func (self *snapshotDataImpl) IsSuperUser(userId string) bool {
 	return superUser.Id != ""
 }
 
-func (self *snapshotDataImpl) GetAuthorization(userId, authorizationId string) UserAuthorization {
-	key := getAuthorizationKey(userId, authorizationId)
+func (self *snapshotDataImpl) GetUserAuthorization(userId, authorizationId string) UserAuthorization {
+	key := getUserAuthorizationKey(userId, authorizationId)
 	return self.UserAuthorizationByKey[key]
 }
 
-func getAuthorizationKey(userId, authorizationId string) string {
+func getUserAuthorizationKey(userId, authorizationId string) string {
 	return strings.Join([]string{userId, authorizationId}, "__")
 }

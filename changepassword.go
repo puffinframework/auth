@@ -33,6 +33,11 @@ func ChangePassword(session Session, oldPassword string, newPassword string, sd 
 	return evt, nil
 }
 
+func ChangeUserPassword(session Session, authorizationId string, userId string, newPassword string, sd SnapshotData) (ChangedPasswordEvent, error) {
+	// TODO
+	return ChangedPasswordEvent{}, nil
+}
+
 func OnChangedPassword(evt ChangedPasswordEvent, sd SnapshotData) error {
 	data := evt.Data
 	sd.SetHashedPassword(data.UserId, data.HashedPassword)

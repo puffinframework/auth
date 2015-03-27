@@ -137,8 +137,6 @@ func (self *authServiceImpl) CreateUser(sessionToken, authorizationId, appId, em
 }
 
 func (self *authServiceImpl) ChangeUserPassword(sessionToken, authorizationId, userId, newPassword string) error {
-	// TODO
-	/*
 	sd := self.processEvents()
 
 	session, err := DecodeSession(sessionToken)
@@ -146,13 +144,12 @@ func (self *authServiceImpl) ChangeUserPassword(sessionToken, authorizationId, u
 		return err
 	}
 
-	evt, err := ChangePassword(session, authorizationId, userId, newPassword, sd)
+	evt, err := ChangeUserPassword(session, authorizationId, userId, newPassword, sd)
 	if err != nil {
 		return err
 	}
 
 	self.es.MustSaveEventData(evt.Header, evt.Data)
-	*/
 	return nil
 }
 

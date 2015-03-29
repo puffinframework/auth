@@ -30,8 +30,8 @@ func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
 	return nil
 }
 
-func OnVerifiedAccount(evt VerifiedAccountEvent, sd SnapshotData) error {
+func (self *snapshotDataImpl) OnVerifiedAccount(evt VerifiedAccountEvent) error {
 	verification := evt.Data
-	sd.SetVerification(verification)
+	self.setVerification(verification)
 	return nil
 }

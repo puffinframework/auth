@@ -87,7 +87,7 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 		case "VerifiedAccount":
 			evt := VerifiedAccountEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
-			err = OnVerifiedAccount(evt, sd)
+			err = sd.OnVerifiedAccount(evt)
 		case "RequestedResetPassword":
 			evt := RequestedResetPasswordEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)

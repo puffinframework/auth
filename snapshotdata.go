@@ -10,16 +10,17 @@ import (
 type SnapshotData interface {
 	GetUserId(appId, email string) string
 	GetHashedPassword(userId string) []byte
-	SetHashedPassword(userId string, hashedPassword []byte)
-	SetVerification(verification Verification)
 	GetVerification(userId string) Verification
-	SetReset(reset Reset)
 	GetReset(userId string) Reset
-	DelReset(userId string)
 	IsSuperUser(userId string) bool
 	GetUserAuthorization(userId, authorizationId string) UserAuthorization
 
+	SetHashedPassword(userId string, hashedPassword []byte)
+	SetReset(reset Reset)
+	DelReset(userId string)
+
 	OnSignedUp(evt SignedUpEvent) error
+	OnVerifiedAccount(evt VerifiedAccountEvent) error
 	OnCreatedUser(evt CreatedUserEvent) error
 }
 
@@ -77,10 +78,6 @@ func (self *snapshotDataImpl) SetHashedPassword(userId string, hashedPassword []
 	self.UserById[userId] = user
 }
 
-func (self *snapshotDataImpl) SetVerification(verification Verification) {
-	self.VerificationByUserId[verification.UserId] = verification
-}
-
 func (self *snapshotDataImpl) GetVerification(userId string) Verification {
 	return self.VerificationByUserId[userId]
 }
@@ -121,7 +118,11 @@ func (self *snapshotDataImpl) createUser(user User) {
 	self.UserById[user.Id] = user
 }
 
+func (self *snapshotDataImpl) setVerification(verification Verification) {
+	self.VerificationByUserId[verification.UserId] = verification
+}
+
 func (self *snapshotDataImpl) setVerificationForUser(user User) {
 	verification := Verification{AppId: user.AppId, Email: user.Email, UserId: user.Id}
-	self.VerificationByUserId[verification.UserId] = verification
+	self.setVerification(verification)
 }

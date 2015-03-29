@@ -6,17 +6,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type ChangedPasswordEvent struct {
-	Header event.Header
-	Data   ChangedPasswordEventData
-}
+type ChangedUserPasswordEvent ChangedPasswordEvent
 
-type ChangedPasswordEventData struct {
-	UserId         string
-	HashedPassword []byte
-}
-
-func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {
+func (self *authServiceImpl) ChangeUserPassword(sessionToken, authorizationId, userId, newPassword string) error {
 	sd := self.processEvents()
 
 	session, err := DecodeSession(sessionToken)
@@ -24,9 +16,9 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 		return err
 	}
 
-	hashedPassword := sd.GetHashedPassword(session.UserId)
-	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(oldPassword)); err != nil {
-		return ErrChangePasswordDenied
+	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
+	if !sd.IsSuperUser(session.UserId) || authorization.UserId == "" || !authorization.IsAuthorized {
+		return ErrNotAuthorized
 	}
 
 	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
@@ -34,7 +26,7 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 		return err
 	}
 
-	evt := ChangedPasswordEvent{
+	evt := ChangedUserPasswordEvent{
 		Header: event.NewHeader("ChangedPassword", 1),
 	}
 	evt.Data.UserId = session.UserId
@@ -44,7 +36,7 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 	return nil
 }
 
-func OnChangedPassword(evt ChangedPasswordEvent, sd SnapshotData) error {
+func OnChangedUserPassword(evt ChangedUserPasswordEvent, sd SnapshotData) error {
 	data := evt.Data
 	sd.SetHashedPassword(data.UserId, data.HashedPassword)
 	return nil

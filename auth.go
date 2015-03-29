@@ -49,23 +49,6 @@ func (self *authServiceImpl) CreateUser(sessionToken, authorizationId, appId, em
 	return nil
 }
 
-func (self *authServiceImpl) ChangeUserPassword(sessionToken, authorizationId, userId, newPassword string) error {
-	sd := self.processEvents()
-
-	session, err := DecodeSession(sessionToken)
-	if err != nil {
-		return err
-	}
-
-	evt, err := ChangeUserPassword(session, authorizationId, userId, newPassword, sd)
-	if err != nil {
-		return err
-	}
-
-	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return nil
-}
-
 func (self *authServiceImpl) ChangeUserEmail(sessionToken, authorizationId, userId, newEmail string) error {
 	// TODO
 	return nil

@@ -51,15 +51,22 @@ func OnChangedPassword(evt ChangedPasswordEvent, sd SnapshotData) error {
 	return nil
 }
 
-func ChangeUserPassword(session Session, authorizationId string, userId string, newPassword string, sd SnapshotData) (ChangedUserPasswordEvent, error) {
+func (self *authServiceImpl) ChangeUserPassword(sessionToken, authorizationId, userId, newPassword string) error {
+	sd := self.processEvents()
+
+	session, err := DecodeSession(sessionToken)
+	if err != nil {
+		return err
+	}
+
 	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
 	if !sd.IsSuperUser(session.UserId) || authorization.UserId == "" || !authorization.IsAuthorized {
-		return ChangedUserPasswordEvent{}, ErrNotAuthorized
+		return ErrNotAuthorized
 	}
 
 	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
 	if err != nil {
-		return ChangedUserPasswordEvent{}, err
+		return err
 	}
 
 	evt := ChangedUserPasswordEvent{
@@ -67,7 +74,9 @@ func ChangeUserPassword(session Session, authorizationId string, userId string, 
 	}
 	evt.Data.UserId = session.UserId
 	evt.Data.HashedPassword = newHashedPassword
-	return evt, nil
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
 }
 
 func OnChangedUserPassword(evt ChangedUserPasswordEvent, sd SnapshotData) error {

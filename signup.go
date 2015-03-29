@@ -11,21 +11,25 @@ type SignedUpEvent struct {
 	Data   User
 }
 
-func SignUp(appId, email, password string, sd SnapshotData) (SignedUpEvent, error) {
+func (self *authServiceImpl) SignUp(appId, email, password string) (verificationToken string, err error) {
+	sd := self.processEvents()
+
 	if sd.GetUserId(appId, email) != "" {
-		return SignedUpEvent{}, ErrEmailAlreadyUsed
+		return "", ErrEmailAlreadyUsed
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
-		return SignedUpEvent{}, err
+		return "", err
 	}
 
 	evt := SignedUpEvent{
 		Header: event.NewHeader("SignedUp", 1),
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
 	}
-	return evt, nil
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return EncodeVerification(Verification{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 
 func OnSignedUp(evt SignedUpEvent, sd SnapshotData) error {

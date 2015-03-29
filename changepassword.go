@@ -17,15 +17,22 @@ type ChangedPasswordEventData struct {
 
 type ChangedUserPasswordEvent ChangedPasswordEvent
 
-func ChangePassword(session Session, oldPassword string, newPassword string, sd SnapshotData) (ChangedPasswordEvent, error) {
+func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {
+	sd := self.processEvents()
+
+	session, err := DecodeSession(sessionToken)
+	if err != nil {
+		return err
+	}
+
 	hashedPassword := sd.GetHashedPassword(session.UserId)
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(oldPassword)); err != nil {
-		return ChangedPasswordEvent{}, ErrChangePasswordDenied
+		return ErrChangePasswordDenied
 	}
 
 	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
 	if err != nil {
-		return ChangedPasswordEvent{}, err
+		return err
 	}
 
 	evt := ChangedPasswordEvent{
@@ -33,7 +40,9 @@ func ChangePassword(session Session, oldPassword string, newPassword string, sd 
 	}
 	evt.Data.UserId = session.UserId
 	evt.Data.HashedPassword = newHashedPassword
-	return evt, nil
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
 }
 
 func OnChangedPassword(evt ChangedPasswordEvent, sd SnapshotData) error {

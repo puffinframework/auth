@@ -32,23 +32,6 @@ func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
 	return &authServiceImpl{es: es, ss: ss}
 }
 
-func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
-	sd := self.processEvents()
-
-	verification, err := DecodeVerification(verificationToken)
-	if err != nil {
-		return err
-	}
-
-	evt, err := VerifyAccount(verification, sd)
-	if err != nil {
-		return err
-	}
-
-	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return nil
-}
-
 func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
 	sd := self.processEvents()
 

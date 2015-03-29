@@ -9,16 +9,25 @@ type VerifiedAccountEvent struct {
 	Data   Verification
 }
 
-func VerifyAccount(verification Verification, sd SnapshotData) (VerifiedAccountEvent, error) {
+func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
+	sd := self.processEvents()
+
+	verification, err := DecodeVerification(verificationToken)
+	if err != nil {
+		return err
+	}
+
 	if sd.GetUserId(verification.AppId, verification.Email) != verification.UserId {
-		return VerifiedAccountEvent{}, ErrVerificationDenied
+		return ErrVerificationDenied
 	}
 
 	evt := VerifiedAccountEvent{
 		Header: event.NewHeader("VerifiedAccount", 1),
 		Data:   verification,
 	}
-	return evt, nil
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
 }
 
 func OnVerifiedAccount(evt VerifiedAccountEvent, sd SnapshotData) error {

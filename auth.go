@@ -32,23 +32,6 @@ func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
 	return &authServiceImpl{es: es, ss: ss}
 }
 
-func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword string) error {
-	sd := self.processEvents()
-
-	reset, err := DecodeReset(resetToken)
-	if err != nil {
-		return err
-	}
-
-	evt, err := ConfirmResetPassword(reset, newPassword, sd)
-	if err != nil {
-		return err
-	}
-
-	self.es.MustSaveEventData(evt.Header, evt.Data)
-	return nil
-}
-
 func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {
 	sd := self.processEvents()
 

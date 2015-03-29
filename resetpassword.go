@@ -55,18 +55,25 @@ func OnRequestedResetPassword(evt RequestedResetPasswordEvent, sd SnapshotData) 
 	return nil
 }
 
-func ConfirmResetPassword(reset Reset, newPassword string, sd SnapshotData) (ConfirmedResetPasswordEvent, error) {
+func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword string) error {
+	sd := self.processEvents()
+
+	reset, err := DecodeReset(resetToken)
+	if err != nil {
+		return err
+	}
+
 	if sd.GetUserId(reset.AppId, reset.Email) != reset.UserId {
-		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
+		return ErrResetPasswordDenied
 	}
 
 	if sd.GetReset(reset.UserId).UserId != reset.UserId {
-		return ConfirmedResetPasswordEvent{}, ErrResetPasswordDenied
+		return ErrResetPasswordDenied
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
 	if err != nil {
-		return ConfirmedResetPasswordEvent{}, err
+		return err
 	}
 
 	evt := ConfirmedResetPasswordEvent{
@@ -74,7 +81,9 @@ func ConfirmResetPassword(reset Reset, newPassword string, sd SnapshotData) (Con
 	}
 	evt.Data.UserId = reset.UserId
 	evt.Data.HashedPassword = hashedPassword
-	return evt, nil
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
 }
 
 func OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent, sd SnapshotData) error {

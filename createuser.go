@@ -34,3 +34,10 @@ func CreateUser(session Session, authorizationId, appId, email, password string,
 
 	return evt, nil
 }
+
+func (self *snapshotDataImpl) OnCreatedUser(evt CreatedUserEvent) error {
+	user := evt.Data
+	self.createUser(user)
+	self.setVerificationForUser(user)
+	return nil
+}

@@ -115,19 +115,6 @@ func getUserAuthorizationKey(userId, authorizationId string) string {
 	return strings.Join([]string{userId, authorizationId}, "__")
 }
 
-func (self *snapshotDataImpl) OnSignedUp(evt SignedUpEvent) error {
-	user := evt.Data
-	self.createUser(user)
-	return nil
-}
-
-func (self *snapshotDataImpl) OnCreatedUser(evt CreatedUserEvent) error {
-	user := evt.Data
-	self.createUser(user)
-	self.setVerificationForUser(user)
-	return nil
-}
-
 func (self *snapshotDataImpl) createUser(user User) {
 	key := joinAppIdEmail(user.AppId, user.Email)
 	self.UserIdByAppIdEmail[key] = user.Id

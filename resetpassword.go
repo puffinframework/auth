@@ -22,15 +22,17 @@ type ConfirmedResetPasswordEventData struct {
 	HashedPassword []byte
 }
 
-func RequestResetPassword(appId, email string, sd SnapshotData) (RequestedResetPasswordEvent, error) {
+func (self *authServiceImpl) RequestResetPassword(appId, email string) (resetToken string, err error) {
+	sd := self.processEvents()
+
 	userId := sd.GetUserId(appId, email)
 	if userId == "" {
-		return RequestedResetPasswordEvent{}, ErrResetPasswordDenied
+		return "", ErrResetPasswordDenied
 	}
 
 	verification := sd.GetVerification(userId)
 	if verification.AppId != appId || verification.Email != email {
-		return RequestedResetPasswordEvent{}, ErrEmailNotVerified
+		return "", ErrEmailNotVerified
 	}
 
 	evt := RequestedResetPasswordEvent{
@@ -42,7 +44,9 @@ func RequestResetPassword(appId, email string, sd SnapshotData) (RequestedResetP
 			CreatedAt: time.Now(),
 		},
 	}
-	return evt, nil
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return EncodeReset(evt.Data), nil
 }
 
 func OnRequestedResetPassword(evt RequestedResetPasswordEvent, sd SnapshotData) error {

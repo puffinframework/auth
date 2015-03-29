@@ -12,22 +12,26 @@ type SignedInEvent struct {
 	Data   Session
 }
 
-func SignIn(appId, email, password string, sd SnapshotData) (SignedInEvent, error) {
+func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
+	sd := self.processEvents()
+
 	userId := sd.GetUserId(appId, email)
 	hashedPassword := sd.GetHashedPassword(userId)
 
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
-		return SignedInEvent{}, ErrSignInDenied
+		return "", ErrSignInDenied
 	}
 
 	verification := sd.GetVerification(userId)
 	if verification.AppId != appId || verification.Email != email {
-		return SignedInEvent{}, ErrEmailNotVerified
+		return "", ErrEmailNotVerified
 	}
 
 	evt := SignedInEvent{
 		Header: event.NewHeader("SignedIn", 1),
 		Data:   Session{UserId: userId, CreatedAt: time.Now()},
 	}
-	return evt, nil
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return EncodeSession(evt.Data), nil
 }

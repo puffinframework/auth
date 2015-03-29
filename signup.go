@@ -31,9 +31,3 @@ func (self *authServiceImpl) SignUp(appId, email, password string) (verification
 	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return EncodeVerification(Verification{AppId: evt.Data.AppId, Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
-
-func OnSignedUp(evt SignedUpEvent, sd SnapshotData) error {
-	user := evt.Data
-	sd.CreateUser(user)
-	return nil
-}

@@ -34,13 +34,3 @@ func CreateUser(session Session, authorizationId, appId, email, password string,
 
 	return evt, nil
 }
-
-func OnCreatedUser(evt CreatedUserEvent, sd SnapshotData) error {
-	user := evt.Data
-	sd.CreateUser(user)
-
-	verification := Verification{AppId: user.AppId, Email: user.Email, UserId: user.Id}
-	sd.SetVerification(verification)
-
-	return nil
-}

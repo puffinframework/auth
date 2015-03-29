@@ -8,7 +8,6 @@ import (
 )
 
 type SnapshotData interface {
-	CreateUser(user User)
 	GetUserId(appId, email string) string
 	GetHashedPassword(userId string) []byte
 	SetHashedPassword(userId string, hashedPassword []byte)
@@ -19,6 +18,9 @@ type SnapshotData interface {
 	DelReset(userId string)
 	IsSuperUser(userId string) bool
 	GetUserAuthorization(userId, authorizationId string) UserAuthorization
+
+	OnSignedUp(evt SignedUpEvent) error
+	OnCreatedUser(evt CreatedUserEvent) error
 }
 
 type snapshotDataImpl struct {
@@ -57,12 +59,6 @@ func (self *snapshotDataImpl) GetLastEventDt() (time.Time, error) {
 func (self *snapshotDataImpl) SetLastEventDt(lastEventDt time.Time) error {
 	self.LastEventDt = lastEventDt
 	return nil
-}
-
-func (self *snapshotDataImpl) CreateUser(user User) {
-	key := joinAppIdEmail(user.AppId, user.Email)
-	self.UserIdByAppIdEmail[key] = user.Id
-	self.UserById[user.Id] = user
 }
 
 func (self *snapshotDataImpl) GetUserId(appId, email string) string {
@@ -117,4 +113,28 @@ func (self *snapshotDataImpl) GetUserAuthorization(userId, authorizationId strin
 
 func getUserAuthorizationKey(userId, authorizationId string) string {
 	return strings.Join([]string{userId, authorizationId}, "__")
+}
+
+func (self *snapshotDataImpl) OnSignedUp(evt SignedUpEvent) error {
+	user := evt.Data
+	self.createUser(user)
+	return nil
+}
+
+func (self *snapshotDataImpl) OnCreatedUser(evt CreatedUserEvent) error {
+	user := evt.Data
+	self.createUser(user)
+	self.setVerificationForUser(user)
+	return nil
+}
+
+func (self *snapshotDataImpl) createUser(user User) {
+	key := joinAppIdEmail(user.AppId, user.Email)
+	self.UserIdByAppIdEmail[key] = user.Id
+	self.UserById[user.Id] = user
+}
+
+func (self *snapshotDataImpl) setVerificationForUser(user User) {
+	verification := Verification{AppId: user.AppId, Email: user.Email, UserId: user.Id}
+	self.VerificationByUserId[verification.UserId] = verification
 }

@@ -83,7 +83,7 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 		case "SignedUp":
 			evt := SignedUpEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
-			err = OnSignedUp(evt, sd)
+			err = sd.OnSignedUp(evt)
 		case "VerifiedAccount":
 			evt := VerifiedAccountEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)

@@ -15,13 +15,16 @@ type SnapshotData interface {
 	IsSuperUser(userId string) bool
 	GetUserAuthorization(userId, authorizationId string) UserAuthorization
 
-	SetHashedPassword(userId string, hashedPassword []byte)
 	SetReset(reset Reset)
 	DelReset(userId string)
 
 	OnSignedUp(evt SignedUpEvent) error
 	OnVerifiedAccount(evt VerifiedAccountEvent) error
+	OnChangedPassword(evt ChangedPasswordEvent) error
+	OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error
+
 	OnCreatedUser(evt CreatedUserEvent) error
+	OnChangedUserPassword(evt ChangedUserPasswordEvent) error
 }
 
 type snapshotDataImpl struct {
@@ -72,12 +75,6 @@ func (self *snapshotDataImpl) GetHashedPassword(userId string) []byte {
 	return user.HashedPassword
 }
 
-func (self *snapshotDataImpl) SetHashedPassword(userId string, hashedPassword []byte) {
-	user := self.UserById[userId]
-	user.HashedPassword = hashedPassword
-	self.UserById[userId] = user
-}
-
 func (self *snapshotDataImpl) GetVerification(userId string) Verification {
 	return self.VerificationByUserId[userId]
 }
@@ -125,4 +122,10 @@ func (self *snapshotDataImpl) setVerification(verification Verification) {
 func (self *snapshotDataImpl) setVerificationForUser(user User) {
 	verification := Verification{AppId: user.AppId, Email: user.Email, UserId: user.Id}
 	self.setVerification(verification)
+}
+
+func (self *snapshotDataImpl) setHashedPassword(userId string, hashedPassword []byte) {
+	user := self.UserById[userId]
+	user.HashedPassword = hashedPassword
+	self.UserById[userId] = user
 }

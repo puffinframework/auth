@@ -36,8 +36,8 @@ func (self *authServiceImpl) ChangeUserPassword(sessionToken, authorizationId, u
 	return nil
 }
 
-func OnChangedUserPassword(evt ChangedUserPasswordEvent, sd SnapshotData) error {
+func (self *snapshotDataImpl) OnChangedUserPassword(evt ChangedUserPasswordEvent) error {
 	data := evt.Data
-	sd.SetHashedPassword(data.UserId, data.HashedPassword)
+	self.setHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }

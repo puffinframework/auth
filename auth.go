@@ -95,11 +95,11 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 		case "ConfirmedResetPassword":
 			evt := ConfirmedResetPasswordEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
-			err = OnConfirmedResetPassword(evt, sd)
+			err = sd.OnConfirmedResetPassword(evt)
 		case "ChangedPassword":
 			evt := ChangedPasswordEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
-			err = OnChangedPassword(evt, sd)
+			err = sd.OnChangedPassword(evt)
 		}
 		return err == nil, err
 	})

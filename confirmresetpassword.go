@@ -47,9 +47,9 @@ func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword
 	return nil
 }
 
-func OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent, sd SnapshotData) error {
+func (self *snapshotDataImpl) OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error {
 	data := evt.Data
-	sd.DelReset(data.UserId)
-	sd.SetHashedPassword(data.UserId, data.HashedPassword)
+	self.DelReset(data.UserId)
+	self.setHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }

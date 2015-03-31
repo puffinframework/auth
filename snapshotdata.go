@@ -15,13 +15,13 @@ type SnapshotData interface {
 	IsSuperUser(userId string) bool
 	GetUserAuthorization(userId, authorizationId string) UserAuthorization
 
-	SetReset(reset Reset)
 	DelReset(userId string)
 
 	OnSignedUp(evt SignedUpEvent) error
 	OnVerifiedAccount(evt VerifiedAccountEvent) error
 	OnChangedPassword(evt ChangedPasswordEvent) error
 	OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error
+	OnRequestedResetPassword(evt RequestedResetPasswordEvent) error
 
 	OnCreatedUser(evt CreatedUserEvent) error
 	OnChangedUserPassword(evt ChangedUserPasswordEvent) error
@@ -83,10 +83,6 @@ func joinAppIdEmail(appId, email string) string {
 	return strings.Join([]string{appId, email}, "::")
 }
 
-func (self *snapshotDataImpl) SetReset(reset Reset) {
-	self.ResetByUserId[reset.UserId] = reset
-}
-
 func (self *snapshotDataImpl) GetReset(userId string) Reset {
 	return self.ResetByUserId[userId]
 }
@@ -128,4 +124,8 @@ func (self *snapshotDataImpl) setHashedPassword(userId string, hashedPassword []
 	user := self.UserById[userId]
 	user.HashedPassword = hashedPassword
 	self.UserById[userId] = user
+}
+
+func (self *snapshotDataImpl) setReset(reset Reset) {
+	self.ResetByUserId[reset.UserId] = reset
 }

@@ -38,8 +38,8 @@ func (self *authServiceImpl) RequestResetPassword(appId, email string) (resetTok
 	return EncodeReset(evt.Data), nil
 }
 
-func OnRequestedResetPassword(evt RequestedResetPasswordEvent, sd SnapshotData) error {
+func (self *snapshotDataImpl) OnRequestedResetPassword(evt RequestedResetPasswordEvent) error {
 	reset := evt.Data
-	sd.SetReset(reset)
+	self.setReset(reset)
 	return nil
 }

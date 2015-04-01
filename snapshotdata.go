@@ -15,8 +15,6 @@ type SnapshotData interface {
 	IsSuperUser(userId string) bool
 	GetUserAuthorization(userId, authorizationId string) UserAuthorization
 
-	DelReset(userId string)
-
 	OnSignedUp(evt SignedUpEvent) error
 	OnVerifiedAccount(evt VerifiedAccountEvent) error
 	OnChangedPassword(evt ChangedPasswordEvent) error
@@ -87,10 +85,6 @@ func (self *snapshotDataImpl) GetReset(userId string) Reset {
 	return self.ResetByUserId[userId]
 }
 
-func (self *snapshotDataImpl) DelReset(userId string) {
-	delete(self.ResetByUserId, userId)
-}
-
 func (self *snapshotDataImpl) IsSuperUser(userId string) bool {
 	superUser := self.SuperUserById[userId]
 	return superUser.Id != ""
@@ -128,4 +122,8 @@ func (self *snapshotDataImpl) setHashedPassword(userId string, hashedPassword []
 
 func (self *snapshotDataImpl) setReset(reset Reset) {
 	self.ResetByUserId[reset.UserId] = reset
+}
+
+func (self *snapshotDataImpl) delReset(userId string) {
+	delete(self.ResetByUserId, userId)
 }

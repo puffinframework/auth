@@ -49,7 +49,7 @@ func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword
 
 func (self *snapshotDataImpl) OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error {
 	data := evt.Data
-	self.DelReset(data.UserId)
+	self.delReset(data.UserId)
 	self.setHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }

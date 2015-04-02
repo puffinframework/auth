@@ -13,7 +13,7 @@ type AuthService interface {
 	VerifyAccount(verificationToken string) error
 	RequestResetPassword(appId, email string) (resetToken string, err error)
 	ConfirmResetPassword(resetToken string, newPassword string) error
-	//ChangeEmail(sessionToken, userId, newEmail string) error
+	ChangeEmail(sessionToken, userId, newEmail string) error
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
 	//CreateSuperUser(email, password string) error
 	CreateUser(sessionToken, authorizationId, appId, email, password string) error
@@ -30,6 +30,11 @@ type authServiceImpl struct {
 
 func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
 	return &authServiceImpl{es: es, ss: ss}
+}
+
+func (self *authServiceImpl) ChangeEmail(sessionToken, userId, newEmail string) error {
+	// TODO
+	return nil
 }
 
 func (self *authServiceImpl) CreateUser(sessionToken, authorizationId, appId, email, password string) error {

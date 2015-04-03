@@ -12,19 +12,26 @@ type CreatedUserEvent struct {
 	Data   User
 }
 
-func CreateUser(session Session, authorizationId, appId, email, password string, sd SnapshotData) (CreatedUserEvent, error) {
+func (self *authServiceImpl) CreateUser(sessionToken, authorizationId, appId, email, password string) error {
+	sd := self.processEvents()
+
+	session, err := DecodeSession(sessionToken)
+	if err != nil {
+		return err
+	}
+
 	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
 	if !sd.IsSuperUser(session.UserId) || authorization.UserId == "" || !authorization.IsAuthorized {
-		return CreatedUserEvent{}, ErrNotAuthorized
+		return ErrNotAuthorized
 	}
 
 	if sd.GetUserId(appId, email) != "" {
-		return CreatedUserEvent{}, ErrEmailAlreadyUsed
+		return ErrEmailAlreadyUsed
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
-		return CreatedUserEvent{}, err
+		return err
 	}
 
 	evt := CreatedUserEvent{
@@ -32,7 +39,8 @@ func CreateUser(session Session, authorizationId, appId, email, password string,
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
 	}
 
-	return evt, nil
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
 }
 
 func (self *snapshotDataImpl) OnCreatedUser(evt CreatedUserEvent) error {

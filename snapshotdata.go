@@ -9,6 +9,7 @@ import (
 
 type SnapshotData interface {
 	GetUserId(appId, email string) string
+	GetAppId(userId string) string
 	GetHashedPassword(userId string) []byte
 	GetVerification(userId string) Verification
 	GetReset(userId string) Reset
@@ -20,6 +21,7 @@ type SnapshotData interface {
 	OnChangedPassword(evt ChangedPasswordEvent) error
 	OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error
 	OnRequestedResetPassword(evt RequestedResetPasswordEvent) error
+	OnChangedEmail(evt ChangedEmailEvent) error
 
 	OnCreatedUser(evt CreatedUserEvent) error
 	OnChangedUserPassword(evt ChangedUserPasswordEvent) error
@@ -66,6 +68,11 @@ func (self *snapshotDataImpl) SetLastEventDt(lastEventDt time.Time) error {
 func (self *snapshotDataImpl) GetUserId(appId, email string) string {
 	key := joinAppIdEmail(appId, email)
 	return self.UserIdByAppIdEmail[key]
+}
+
+func (self *snapshotDataImpl) GetAppId(userId string) string {
+	user := self.UserById[userId]
+	return user.AppId
 }
 
 func (self *snapshotDataImpl) GetHashedPassword(userId string) []byte {
@@ -126,4 +133,18 @@ func (self *snapshotDataImpl) setReset(reset Reset) {
 
 func (self *snapshotDataImpl) delReset(userId string) {
 	delete(self.ResetByUserId, userId)
+}
+
+func (self *snapshotDataImpl) setEmail(userId, email string) {
+	user := self.UserById[userId]
+	oldEmail := user.Email
+
+	user.Email = email
+	self.UserById[userId] = user
+
+	oldKey := joinAppIdEmail(user.AppId, oldEmail)
+	delete(self.UserIdByAppIdEmail, oldKey)
+
+	newKey := joinAppIdEmail(user.AppId, email)
+	self.UserIdByAppIdEmail[newKey] = userId
 }

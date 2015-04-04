@@ -6,12 +6,10 @@ import (
 
 type ChangedEmailEvent struct {
 	Header event.Header
-	Data   ChangedEmailEventData
-}
-
-type ChangedEmailEventData struct {
-	UserId string
-	Email  string
+	Data   struct {
+		UserId string
+		Email  string
+	}
 }
 
 func (self *authServiceImpl) ChangeEmail(sessionToken, newEmail string) error {

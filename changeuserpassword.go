@@ -17,7 +17,7 @@ func (self *authServiceImpl) ChangeUserPassword(sessionToken, authorizationId, u
 	}
 
 	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
-	if !sd.IsSuperUser(session.UserId) || authorization.UserId == "" || !authorization.IsAuthorized {
+	if !authorization.IsAuthorized {
 		return ErrNotAuthorized
 	}
 

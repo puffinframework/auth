@@ -21,7 +21,7 @@ func (self *authServiceImpl) CreateUser(sessionToken, authorizationId, appId, em
 	}
 
 	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
-	if !sd.IsSuperUser(session.UserId) || authorization.UserId == "" || !authorization.IsAuthorized {
+	if !authorization.IsAuthorized {
 		return ErrNotAuthorized
 	}
 

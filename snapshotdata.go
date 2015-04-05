@@ -13,7 +13,6 @@ type SnapshotData interface {
 	GetHashedPassword(userId string) []byte
 	GetVerification(userId string) Verification
 	GetReset(userId string) Reset
-	IsSuperUser(userId string) bool
 	GetUserAuthorization(userId, authorizationId string) UserAuthorization
 
 	OnSignedUp(evt SignedUpEvent) error
@@ -29,7 +28,6 @@ type SnapshotData interface {
 
 type snapshotDataImpl struct {
 	LastEventDt            time.Time
-	SuperUserById          map[string]SuperUser
 	UserById               map[string]User
 	UserIdByAppIdEmail     map[string]string
 	VerificationByUserId   map[string]Verification
@@ -90,11 +88,6 @@ func joinAppIdEmail(appId, email string) string {
 
 func (self *snapshotDataImpl) GetReset(userId string) Reset {
 	return self.ResetByUserId[userId]
-}
-
-func (self *snapshotDataImpl) IsSuperUser(userId string) bool {
-	superUser := self.SuperUserById[userId]
-	return superUser.Id != ""
 }
 
 func (self *snapshotDataImpl) GetUserAuthorization(userId, authorizationId string) UserAuthorization {

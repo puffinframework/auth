@@ -4,12 +4,6 @@ import (
 	"time"
 )
 
-type SuperUser struct {
-	Id             string
-	Email          string
-	HashedPassword []byte
-}
-
 type User struct {
 	Id             string
 	AppId          string

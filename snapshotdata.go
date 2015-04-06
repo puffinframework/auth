@@ -36,12 +36,7 @@ type snapshotDataImpl struct {
 }
 
 func NewSnapshotData() SnapshotData {
-	return &snapshotDataImpl{
-		LastEventDt:          time.Unix(0, 0),
-		UserById:             make(map[string]User),
-		UserIdByKey:          make(map[string]string),
-		VerificationByUserId: make(map[string]Verification),
-	}
+	return &snapshotDataImpl{}
 }
 
 func (self *snapshotDataImpl) LoadFrom(ss snapshot.Store) error {

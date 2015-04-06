@@ -29,7 +29,7 @@ type SnapshotData interface {
 type snapshotDataImpl struct {
 	LastEventDt            time.Time
 	UserById               map[string]User
-	UserIdByAppIdEmail     map[string]string
+	UserIdByKey            map[string]string
 	VerificationByUserId   map[string]Verification
 	ResetByUserId          map[string]Reset
 	UserAuthorizationByKey map[string]UserAuthorization
@@ -39,7 +39,7 @@ func NewSnapshotData() SnapshotData {
 	return &snapshotDataImpl{
 		LastEventDt:          time.Unix(0, 0),
 		UserById:             make(map[string]User),
-		UserIdByAppIdEmail:   make(map[string]string),
+		UserIdByKey:          make(map[string]string),
 		VerificationByUserId: make(map[string]Verification),
 	}
 }
@@ -64,8 +64,8 @@ func (self *snapshotDataImpl) SetLastEventDt(lastEventDt time.Time) error {
 }
 
 func (self *snapshotDataImpl) GetUserId(appId, email string) string {
-	key := joinAppIdEmail(appId, email)
-	return self.UserIdByAppIdEmail[key]
+	key := getUserIdKey(appId, email)
+	return self.UserIdByKey[key]
 }
 
 func (self *snapshotDataImpl) GetAppId(userId string) string {
@@ -82,7 +82,7 @@ func (self *snapshotDataImpl) GetVerification(userId string) Verification {
 	return self.VerificationByUserId[userId]
 }
 
-func joinAppIdEmail(appId, email string) string {
+func getUserIdKey(appId, email string) string {
 	return strings.Join([]string{appId, email}, "::")
 }
 
@@ -100,8 +100,8 @@ func getUserAuthorizationKey(userId, authorizationId string) string {
 }
 
 func (self *snapshotDataImpl) createUser(user User) {
-	key := joinAppIdEmail(user.AppId, user.Email)
-	self.UserIdByAppIdEmail[key] = user.Id
+	key := getUserIdKey(user.AppId, user.Email)
+	self.UserIdByKey[key] = user.Id
 	self.UserById[user.Id] = user
 }
 
@@ -135,9 +135,9 @@ func (self *snapshotDataImpl) setEmail(userId, email string) {
 	user.Email = email
 	self.UserById[userId] = user
 
-	oldKey := joinAppIdEmail(user.AppId, oldEmail)
-	delete(self.UserIdByAppIdEmail, oldKey)
+	oldKey := getUserIdKey(user.AppId, oldEmail)
+	delete(self.UserIdByKey, oldKey)
 
-	newKey := joinAppIdEmail(user.AppId, email)
-	self.UserIdByAppIdEmail[newKey] = userId
+	newKey := getUserIdKey(user.AppId, email)
+	self.UserIdByKey[newKey] = userId
 }

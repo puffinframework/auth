@@ -8,12 +8,10 @@ import (
 
 type ConfirmedResetPasswordEvent struct {
 	Header event.Header
-	Data   ConfirmedResetPasswordEventData
-}
-
-type ConfirmedResetPasswordEventData struct {
-	UserId         string
-	HashedPassword []byte
+	Data   struct {
+		UserId         string
+		HashedPassword []byte
+	}
 }
 
 func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword string) error {

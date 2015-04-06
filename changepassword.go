@@ -8,12 +8,10 @@ import (
 
 type ChangedPasswordEvent struct {
 	Header event.Header
-	Data   ChangedPasswordEventData
-}
-
-type ChangedPasswordEventData struct {
-	UserId         string
-	HashedPassword []byte
+	Data   struct {
+		UserId         string
+		HashedPassword []byte
+	}
 }
 
 func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {

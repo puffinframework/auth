@@ -32,11 +32,6 @@ func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
 	return &authServiceImpl{es: es, ss: ss}
 }
 
-func (self *authServiceImpl) ChangeUserEmail(sessionToken, authorizationId, userId, newEmail string) error {
-	// TODO
-	return nil
-}
-
 func (self *authServiceImpl) RemoveUser(sessionToken, authorizationId, userId error) error {
 	// TODO
 	return nil

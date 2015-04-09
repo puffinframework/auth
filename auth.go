@@ -32,11 +32,6 @@ func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
 	return &authServiceImpl{es: es, ss: ss}
 }
 
-func (self *authServiceImpl) SetAuthorizations(sessionToken, authorizationId string, userIds []string, authorizationIds []string, IsAuthorized bool) error {
-	// TODO
-	return nil
-}
-
 func (self *authServiceImpl) processEvents() SnapshotData {
 	sd := NewSnapshotData()
 

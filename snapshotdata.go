@@ -90,6 +90,14 @@ func (self *snapshotDataImpl) GetUserAuthorization(userId, authorizationId strin
 	return self.UserAuthorizationByKey[key]
 }
 
+func (self *snapshotDataImpl) setUserAuthorization(userId, authorizationId string, isAuthorized bool) {
+	key := getUserAuthorizationKey(userId, authorizationId)
+	authorization := self.UserAuthorizationByKey[key]
+	authorization.UserId = userId
+	authorization.AuthorizationId = authorizationId
+	authorization.IsAuthorized = isAuthorized
+}
+
 func getUserAuthorizationKey(userId, authorizationId string) string {
 	return strings.Join([]string{userId, authorizationId}, "__")
 }

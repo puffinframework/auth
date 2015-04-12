@@ -13,7 +13,7 @@ type SetAuthorizationsEvent struct {
 	}
 }
 
-func (self *authServiceImpl) SetAuthorizations(sessionToken, authorizationId string, userIds []string, authorizationIds []string, IsAuthorized bool) error {
+func (self *authServiceImpl) SetAuthorizations(sessionToken, authorizationId string, userIds []string, authorizationIds []string, isAuthorized bool) error {
 	sd := self.processEvents()
 
 	session, err := DecodeSession(sessionToken)
@@ -26,6 +26,23 @@ func (self *authServiceImpl) SetAuthorizations(sessionToken, authorizationId str
 		return ErrNotAuthorized
 	}
 
-	// TODO
+	evt := SetAuthorizationsEvent{
+		Header: event.NewHeader("SetAuthorizationsEvent", 1),
+	}
+	evt.Data.UserIds = userIds
+	evt.Data.AuthorizationIds = authorizationIds
+	evt.Data.IsAuthorized = isAuthorized
+
+	self.es.MustSaveEventData(evt.Header, evt.Data)
+	return nil
+}
+
+func (self *snapshotDataImpl) OnSetAuthorizations(evt SetAuthorizationsEvent) error {
+	data := evt.Data
+	for _, userId := range data.UserIds {
+		for _, authorizationId := range data.AuthorizationIds {
+			self.setUserAuthorization(userId, authorizationId, data.IsAuthorized)
+		}
+	}
 	return nil
 }

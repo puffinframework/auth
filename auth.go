@@ -76,6 +76,10 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 			evt := CreatedUserEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
 			err = sd.OnCreatedUser(evt)
+		case "ChangedUserPassword":
+			evt := ChangedUserPasswordEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
+			err = sd.OnChangedUserPassword(evt)
 		}
 		// TODO
 		return err == nil, err

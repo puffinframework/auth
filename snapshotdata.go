@@ -25,6 +25,7 @@ type SnapshotData interface {
 	OnCreatedUser(evt CreatedUserEvent) error
 	OnChangedUserPassword(evt ChangedUserPasswordEvent) error
 	OnChangedUserEmail(evt ChangedUserEmailEvent) error
+	OnRemovedUser(evt RemovedUserEvent) error
 }
 
 type snapshotDataImpl struct {

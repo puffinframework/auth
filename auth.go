@@ -84,6 +84,10 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 			evt := ChangedUserEmailEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
 			err = sd.OnChangedUserEmail(evt)
+		case "RemovedUser":
+			evt := RemovedUserEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
+			err = sd.OnRemovedUser(evt)
 		}
 		// TODO
 		return err == nil, err

@@ -88,6 +88,10 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 			evt := RemovedUserEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
 			err = sd.OnRemovedUser(evt)
+		case "SetAuthorizations":
+			evt := SetAuthorizationsEvent{Header: header}
+			self.es.MustLoadEventData(header, &evt.Data)
+			err = sd.OnSetAuthorizations(evt)
 		}
 		// TODO
 		return err == nil, err

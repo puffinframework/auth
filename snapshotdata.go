@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"strings"
 	"time"
@@ -14,19 +15,6 @@ type SnapshotData interface {
 	GetVerification(userId string) Verification
 	GetReset(userId string) Reset
 	GetUserAuthorization(userId, authorizationId string) UserAuthorization
-
-	OnSignedUp(evt SignedUpEvent) error
-	OnVerifiedAccount(evt VerifiedAccountEvent) error
-	OnChangedPassword(evt ChangedPasswordEvent) error
-	OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error
-	OnRequestedResetPassword(evt RequestedResetPasswordEvent) error
-	OnChangedEmail(evt ChangedEmailEvent) error
-
-	OnCreatedUser(evt CreatedUserEvent) error
-	OnChangedUserPassword(evt ChangedUserPasswordEvent) error
-	OnChangedUserEmail(evt ChangedUserEmailEvent) error
-	OnRemovedUser(evt RemovedUserEvent) error
-	OnSetAuthorizations(evt SetAuthorizationsEvent) error
 }
 
 type snapshotDataImpl struct {
@@ -164,3 +152,4 @@ func (self *snapshotDataImpl) setEmail(userId, email string) {
 	newKey := getUserIdKey(user.AppId, email)
 	self.UserIdByKey[newKey] = userId
 }
+*/

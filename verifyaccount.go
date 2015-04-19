@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"github.com/puffinframework/event"
 )
@@ -35,3 +36,4 @@ func (self *snapshotDataImpl) OnVerifiedAccount(evt VerifiedAccountEvent) error 
 	self.setVerification(verification)
 	return nil
 }
+*/

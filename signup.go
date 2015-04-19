@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"github.com/puffinframework/event"
 	"github.com/satori/go.uuid"
@@ -37,3 +38,4 @@ func (self *snapshotDataImpl) OnSignedUp(evt SignedUpEvent) error {
 	self.createUser(user)
 	return nil
 }
+*/

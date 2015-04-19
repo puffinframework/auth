@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"time"
 
@@ -43,3 +44,4 @@ func (self *snapshotDataImpl) OnRequestedResetPassword(evt RequestedResetPasswor
 	self.setReset(reset)
 	return nil
 }
+*/

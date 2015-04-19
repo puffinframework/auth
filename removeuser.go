@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"github.com/puffinframework/event"
 )
@@ -36,3 +37,4 @@ func (self *snapshotDataImpl) OnRemovedUser(evt RemovedUserEvent) error {
 	self.removeUser(userId)
 	return nil
 }
+*/

@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"github.com/puffinframework/event"
 )
@@ -34,3 +35,4 @@ func (self *snapshotDataImpl) OnChangedUserEmail(evt ChangedUserEmailEvent) erro
 	self.setEmail(data.UserId, data.Email)
 	return nil
 }
+*/

@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"github.com/puffinframework/event"
 
@@ -47,3 +48,4 @@ func (self *snapshotDataImpl) OnChangedPassword(evt ChangedPasswordEvent) error 
 	self.setHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }
+*/

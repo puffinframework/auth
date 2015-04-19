@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"log"
 	"time"
@@ -101,3 +102,4 @@ func DecodeReset(resetToken string) (Reset, error) {
 	}
 	return reset, nil
 }
+*/

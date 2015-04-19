@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	"time"
 
@@ -35,3 +36,4 @@ func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken
 	self.es.MustSaveEventData(evt.Header, evt.Data)
 	return EncodeSession(evt.Data), nil
 }
+*/

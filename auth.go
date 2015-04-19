@@ -1,36 +1,36 @@
 package auth
 
-import (
-	"log"
-
-	"github.com/puffinframework/event"
-	"github.com/puffinframework/snapshot"
-)
-
-type AuthService interface {
-	// Commands for admins
-	CreateUser(adminToken, appId, email, password string) error
-	UpdateUserPassword(adminToken, userId, newPassword string) error
-	UpdateUserEmail(adminToken, userId, newEmail string) error
-	RemoveUser(adminToken, userId string) error
-	// Commands for users without a session
-	SignUp(appId, email, password string) (verificationToken string, err error)
-	SignIn(appId, email, password string) (sessionToken string, err error)
-	VerifyAccount(verificationToken string) error
-	RequestResetPassword(appId, email string) (resetToken string, err error)
-	ConfirmResetPassword(resetToken string, newPassword string) error
-	// Commmans for users within a session
-	ChangeEmail(sessionToken, newEmail string) error
-	ChangePassword(sessionToken, oldPassword, newPassword string) error
+type Service interface {
+	// for users without a session
+	/*
+		SignUp(appId, email, password string) (verificationToken string, err error)
+		OnSignedUp(evt SignedUpEvent) error
+		SignIn(appId, email, password string) (sessionToken string, err error)
+		VerifyAccount(verificationToken string) error
+		OnVerifiedAccount(evt VerifiedAccountEvent) error
+		RequestResetPassword(appId, email string) (resetToken string, err error)
+		ConfirmResetPassword(resetToken string, newPassword string) error
+		// for users within a session
+		ChangeEmail(sessionToken, newEmail string) error
+		ChangePassword(sessionToken, oldPassword, newPassword string) error
+		// for admins
+		CreateUser(adminToken, appId, email, password string) error
+		OnCreatedUser(evt CreatedUserEvent) error
+		UpdateUserPassword(adminToken, userId, newPassword string) error
+		UpdateUserEmail(adminToken, userId, newEmail string) error
+		RemoveUser(adminToken, userId string) error
+	*/
 }
 
-type authServiceImpl struct {
-	es event.Store
-	ss snapshot.Store
+/*
+type serviceImpl struct {
+	es          event.Store
+	ss          snapshot.Store
+	adminTokens []AdminToken
 }
 
-func NewAuthService(es event.Store, ss snapshot.Store) AuthService {
-	return &authServiceImpl{es: es, ss: ss}
+func NewAuthService(es event.Store, ss snapshot.Store, adminTokens []AdminToken) AuthService {
+	return &authServiceImpl{es: es, ss: ss, adminTokens: adminTokens}
 }
 
 func (self *authServiceImpl) processEvents() SnapshotData {
@@ -89,10 +89,6 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 			evt := RemovedUserEvent{Header: header}
 			self.es.MustLoadEventData(header, &evt.Data)
 			err = sd.OnRemovedUser(evt)
-		case "SetAuthorizations":
-			evt := SetAuthorizationsEvent{Header: header}
-			self.es.MustLoadEventData(header, &evt.Data)
-			err = sd.OnSetAuthorizations(evt)
 		}
 		// TODO
 		return err == nil, err
@@ -107,3 +103,4 @@ func (self *authServiceImpl) processEvents() SnapshotData {
 
 	return sd
 }
+*/

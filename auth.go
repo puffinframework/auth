@@ -8,19 +8,20 @@ import (
 )
 
 type AuthService interface {
+	// Commands for admins
+	CreateUser(adminToken, appId, email, password string) error
+	UpdateUserPassword(adminToken, userId, newPassword string) error
+	UpdateUserEmail(adminToken, userId, newEmail string) error
+	RemoveUser(adminToken, userId string) error
+	// Commands for users without a session
 	SignUp(appId, email, password string) (verificationToken string, err error)
 	SignIn(appId, email, password string) (sessionToken string, err error)
 	VerifyAccount(verificationToken string) error
 	RequestResetPassword(appId, email string) (resetToken string, err error)
 	ConfirmResetPassword(resetToken string, newPassword string) error
+	// Commmans for users within a session
 	ChangeEmail(sessionToken, newEmail string) error
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
-
-	CreateUser(sessionToken, authorizationId, appId, email, password string) error
-	ChangeUserPassword(sessionToken, authorizationId, userId, newPassword string) error
-	ChangeUserEmail(sessionToken, authorizationId, userId, newEmail string) error
-	RemoveUser(sessionToken, authorizationId, userId string) error
-	SetAuthorizations(sessionToken, authorizationId string, userIds []string, authorizationIds []string, IsAuthorized bool) error
 }
 
 type authServiceImpl struct {

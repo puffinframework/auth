@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+type AdminToken struct {
+	AccessKey string
+	SecretKey []byte
+}
+
 type User struct {
 	Id             string
 	AppId          string
@@ -18,19 +23,11 @@ type Session struct {
 
 type Verification struct {
 	UserId string
-	AppId  string
 	Email  string
 }
 
 type Reset struct {
 	UserId    string
-	AppId     string
 	Email     string
 	CreatedAt time.Time
-}
-
-type UserAuthorization struct {
-	AuthorizationId string
-	UserId          string
-	IsAuthorized    bool
 }

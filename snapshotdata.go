@@ -81,11 +81,6 @@ func getUserAuthorizationKey(userId, authorizationId string) string {
 	return strings.Join([]string{userId, authorizationId}, "__")
 }
 
-func (self *snapshotDataImpl) createUser(user User) {
-	key := getUserIdKey(user.AppId, user.Email)
-	self.UserIdByKey[key] = user.Id
-	self.UserById[user.Id] = user
-}
 
 func (self *snapshotDataImpl) removeUser(userId string) {
 	user := self.UserById[userId]

@@ -7,7 +7,8 @@ import (
 
 type Store interface {
 	GetUserId(appId, email string) (string, error)
-	CreateUser(user User) error
+
+	OnSignedUp(evt SignedUpEvent) error
 }
 
 type memStore struct {
@@ -27,7 +28,12 @@ func (self *memStore) GetUserId(appId, email string) (string, error) {
 	return self.UserIdByKey[key], nil
 }
 
-func (self *memStore) CreateUser(user User) error {
+func (self *memStore) setLastEventDt(lastEventDt time.Time) error {
+	self.LastEventDt = lastEventDt
+	return nil
+}
+
+func (self *memStore) createUser(user User) error {
 	key := getUserIdKey(user.AppId, user.Email)
 	self.UserIdByKey[key] = user.Id
 	self.UserById[user.Id] = user

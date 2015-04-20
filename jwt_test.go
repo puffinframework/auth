@@ -1,6 +1,5 @@
 package auth_test
 
-/*
 import (
 	"testing"
 	"time"
@@ -44,32 +43,27 @@ func TestSessionEncoding(t *testing.T) {
 }
 
 func TestVerificationEncoding(t *testing.T) {
-	appId := "app-1"
 	userId := "user-1"
 	email := "user@app.com"
 
-	verificationToken := auth.EncodeVerification(auth.Verification{AppId: appId, Email: email, UserId: userId})
+	verificationToken := auth.EncodeVerification(auth.Verification{Email: email, UserId: userId})
 
 	verification, err := auth.DecodeVerification(verificationToken)
 	assert.Nil(t, err)
-	assert.Equal(t, appId, verification.AppId)
 	assert.Equal(t, email, verification.Email)
 	assert.Equal(t, userId, verification.UserId)
 }
 
 func TestResetEncoding(t *testing.T) {
-	appId := "app-1"
 	userId := "user-1"
 	email := "user@app.com"
 	createdAt := time.Unix(123, 0)
 
-	resetToken := auth.EncodeReset(auth.Reset{AppId: appId, Email: email, UserId: userId, CreatedAt: createdAt})
+	resetToken := auth.EncodeReset(auth.Reset{Email: email, UserId: userId, CreatedAt: createdAt})
 
 	reset, err := auth.DecodeReset(resetToken)
 	assert.Nil(t, err)
-	assert.Equal(t, appId, reset.AppId)
 	assert.Equal(t, email, reset.Email)
 	assert.Equal(t, userId, reset.UserId)
 	assert.Equal(t, createdAt, reset.CreatedAt)
 }
-*/

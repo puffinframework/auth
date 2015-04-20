@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"log"
 	"time"
@@ -41,7 +40,6 @@ func DecodeSession(sessionToken string) (Session, error) {
 
 func EncodeVerification(verification Verification) string {
 	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["appId"] = verification.AppId
 	token.Claims["email"] = verification.Email
 	token.Claims["userId"] = verification.UserId
 	verificationToken, err := token.SignedString([]byte(jwtkey))
@@ -63,7 +61,6 @@ func DecodeVerification(verificationToken string) (Verification, error) {
 	}
 
 	verification := Verification{
-		AppId:  token.Claims["appId"].(string),
 		Email:  token.Claims["email"].(string),
 		UserId: token.Claims["userId"].(string),
 	}
@@ -72,7 +69,6 @@ func DecodeVerification(verificationToken string) (Verification, error) {
 
 func EncodeReset(reset Reset) string {
 	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["appId"] = reset.AppId
 	token.Claims["email"] = reset.Email
 	token.Claims["userId"] = reset.UserId
 	token.Claims["createdAt"] = reset.CreatedAt.Unix()
@@ -95,11 +91,9 @@ func DecodeReset(resetToken string) (Reset, error) {
 	}
 
 	reset := Reset{
-		AppId:     token.Claims["appId"].(string),
 		Email:     token.Claims["email"].(string),
 		UserId:    token.Claims["userId"].(string),
 		CreatedAt: time.Unix(int64(token.Claims["createdAt"].(float64)), 0),
 	}
 	return reset, nil
 }
-*/

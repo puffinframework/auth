@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"errors"
 )
@@ -18,4 +17,3 @@ var (
 	ErrResetPasswordExpired error = errors.New("AUTH-09")
 	ErrNotAuthorized        error = errors.New("AUTH-10")
 )
-*/

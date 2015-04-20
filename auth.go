@@ -1,9 +1,11 @@
 package auth
 
+import "github.com/puffinframework/event"
+
 type Service interface {
 	// for users without a session
+	SignUp(appId, email, password string) (verificationToken string, err error)
 	/*
-		SignUp(appId, email, password string) (verificationToken string, err error)
 		OnSignedUp(evt SignedUpEvent) error
 		SignIn(appId, email, password string) (sessionToken string, err error)
 		VerifyAccount(verificationToken string) error
@@ -22,17 +24,17 @@ type Service interface {
 	*/
 }
 
-/*
 type serviceImpl struct {
-	es          event.Store
-	ss          snapshot.Store
+	events      event.Store
+	store       Store
 	adminTokens []AdminToken
 }
 
-func NewAuthService(es event.Store, ss snapshot.Store, adminTokens []AdminToken) AuthService {
-	return &authServiceImpl{es: es, ss: ss, adminTokens: adminTokens}
+func NewService(events event.Store, store Store, adminTokens []AdminToken) Service {
+	return &serviceImpl{events: events, store: store, adminTokens: adminTokens}
 }
 
+/*
 func (self *authServiceImpl) processEvents() SnapshotData {
 	sd := NewSnapshotData()
 

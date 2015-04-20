@@ -18,17 +18,9 @@ type SnapshotData interface {
 }
 
 type snapshotDataImpl struct {
-	LastEventDt            time.Time
-	UserById               map[string]User
-	UserIdByKey            map[string]string
-	VerificationByUserId   map[string]Verification
-	ResetByUserId          map[string]Reset
-	UserAuthorizationByKey map[string]UserAuthorization
 }
 
-func NewSnapshotData() SnapshotData {
-	return &snapshotDataImpl{}
-}
+
 
 func (self *snapshotDataImpl) LoadFrom(ss snapshot.Store) error {
 	ss.MustLoadSnapshot("AuthSnapshot", self)
@@ -49,10 +41,6 @@ func (self *snapshotDataImpl) SetLastEventDt(lastEventDt time.Time) error {
 	return nil
 }
 
-func (self *snapshotDataImpl) GetUserId(appId, email string) string {
-	key := getUserIdKey(appId, email)
-	return self.UserIdByKey[key]
-}
 
 func (self *snapshotDataImpl) GetAppId(userId string) string {
 	user := self.UserById[userId]

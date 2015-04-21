@@ -26,10 +26,10 @@ type Service interface {
 
 type serviceImpl struct {
 	eventStore  event.Store
-	store       ServiceStore
+	store       Store
 	adminTokens []AdminToken
 }
 
-func NewService(eventStore event.Store, serviceStore ServiceStore, adminTokens []AdminToken) Service {
-	return &serviceImpl{eventStore: eventStore, store: serviceStore, adminTokens: adminTokens}
+func NewService(eventStore event.Store, store Store, adminTokens []AdminToken) Service {
+	return &serviceImpl{eventStore: eventStore, store: store, adminTokens: adminTokens}
 }

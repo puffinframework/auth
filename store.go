@@ -7,7 +7,7 @@ import (
 	"github.com/puffinframework/event"
 )
 
-type ServiceStore interface {
+type Store interface {
 	ProcessEvents() error
 	GetUserId(appId, email string) (string, error)
 }
@@ -21,7 +21,7 @@ type memStore struct {
 	ResetByUserId        map[string]Reset
 }
 
-func NewMemServiceStore(eventStore event.Store) ServiceStore {
+func NewMemStore(eventStore event.Store) Store {
 	return &memStore{eventStore: eventStore}
 }
 

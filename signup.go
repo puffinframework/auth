@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/puffinframework/event"
+
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,7 +13,7 @@ type SignedUpEvent struct {
 }
 
 func (self *serviceImpl) SignUp(appId, email, password string) (string, error) {
-	//sd := self.processEvents()
+	self.store.ProcessEvents()
 
 	userId, err := self.store.GetUserId(appId, email)
 	if err != nil {
@@ -33,13 +34,11 @@ func (self *serviceImpl) SignUp(appId, email, password string) (string, error) {
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
 	}
 
-	//self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.events.MustLoadEvent(evt.Header, evt.Data)
 	return EncodeVerification(Verification{Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 
-func (self *memStore) OnSignedUp(evt SignedUpEvent) error {
+func (self *memStore) onSignedUp(evt SignedUpEvent) error {
 	user := evt.Data
-	self.createUser(user)
-	self.setLastEventDt(evt.Header.CreatedAt)
-	return nil
+	return self.createUser(user)
 }

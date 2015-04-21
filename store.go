@@ -3,15 +3,17 @@ package auth
 import (
 	"strings"
 	"time"
+
+	"github.com/puffinframework/event"
 )
 
 type Store interface {
+	ProcessEvents() error
 	GetUserId(appId, email string) (string, error)
-
-	OnSignedUp(evt SignedUpEvent) error
 }
 
 type memStore struct {
+	events               event.Store
 	LastEventDt          time.Time
 	UserById             map[string]User
 	UserIdByKey          map[string]string
@@ -19,18 +21,32 @@ type memStore struct {
 	ResetByUserId        map[string]Reset
 }
 
-func NewMemStore() Store {
-	return &memStore{}
+func NewMemStore(events event.Store) Store {
+	return &memStore{events: events}
+}
+
+func (self *memStore) ProcessEvents() error {
+	return self.events.ForEachEventHeader(self.LastEventDt, func(header event.Header) (bool, error) {
+		var err error
+
+		switch header.Type {
+		case "SignedUp":
+			evt := SignedUpEvent{Header: header}
+			self.events.MustLoadEvent(header, &evt.Data)
+			self.onSignedUp(evt)
+		}
+
+		if err != nil {
+			self.LastEventDt = header.CreatedAt
+		}
+
+		return err == nil, err
+	})
 }
 
 func (self *memStore) GetUserId(appId, email string) (string, error) {
 	key := getUserIdKey(appId, email)
 	return self.UserIdByKey[key], nil
-}
-
-func (self *memStore) setLastEventDt(lastEventDt time.Time) error {
-	self.LastEventDt = lastEventDt
-	return nil
 }
 
 func (self *memStore) createUser(user User) error {

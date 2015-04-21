@@ -13,7 +13,9 @@ type SignedUpEvent struct {
 }
 
 func (self *serviceImpl) SignUp(appId, email, password string) (string, error) {
-	self.store.ProcessEvents()
+	if err := self.store.ProcessEvents(); err != nil {
+		return "", err
+	}
 
 	userId, err := self.store.GetUserId(appId, email)
 	if err != nil {
@@ -34,7 +36,7 @@ func (self *serviceImpl) SignUp(appId, email, password string) (string, error) {
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
 	}
 
-	self.eventStore.MustLoadEvent(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return EncodeVerification(Verification{Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 

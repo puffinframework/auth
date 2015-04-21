@@ -13,7 +13,7 @@ type Store interface {
 }
 
 type memStore struct {
-	events               event.Store
+	eventStore           event.Store
 	LastEventDt          time.Time
 	UserById             map[string]User
 	UserIdByKey          map[string]string
@@ -21,18 +21,18 @@ type memStore struct {
 	ResetByUserId        map[string]Reset
 }
 
-func NewMemStore(events event.Store) Store {
-	return &memStore{events: events}
+func NewMemStore(eventStore event.Store) Store {
+	return &memStore{eventStore: eventStore}
 }
 
 func (self *memStore) ProcessEvents() error {
-	return self.events.ForEachEventHeader(self.LastEventDt, func(header event.Header) (bool, error) {
+	return self.eventStore.ForEachEventHeader(self.LastEventDt, func(header event.Header) (bool, error) {
 		var err error
 
 		switch header.Type {
 		case "SignedUp":
 			evt := SignedUpEvent{Header: header}
-			self.events.MustLoadEvent(header, &evt.Data)
+			self.eventStore.MustLoadEvent(header, &evt.Data)
 			self.onSignedUp(evt)
 		}
 

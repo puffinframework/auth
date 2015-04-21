@@ -34,7 +34,7 @@ func (self *serviceImpl) SignUp(appId, email, password string) (string, error) {
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
 	}
 
-	self.events.MustLoadEvent(evt.Header, evt.Data)
+	self.eventStore.MustLoadEvent(evt.Header, evt.Data)
 	return EncodeVerification(Verification{Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 

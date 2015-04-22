@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log"
 	"strings"
 	"time"
 
@@ -9,7 +10,10 @@ import (
 
 type Store interface {
 	MustProcessEvents()
+
 	GetUserId(appId, email string) (string, error)
+
+	onSignedUpEvent(evt SignedUpEvent) error
 }
 
 type memStore struct {
@@ -23,6 +27,28 @@ type memStore struct {
 
 func NewMemStore(eventStore event.Store) Store {
 	return &memStore{eventStore: eventStore}
+}
+
+func (self *memStore) MustProcessEvents() {
+	if err := self.eventStore.ForEachEventHeader(self.LastEventDt, func(header event.Header) (bool, error) {
+		var err error
+
+		switch header.Type {
+		case "SignedUp":
+			evt := SignedUpEvent{Header: header}
+			self.eventStore.MustLoadEvent(header, &evt.Data)
+			err = self.onSignedUpEvent(evt)
+		}
+
+		if err != nil {
+			self.LastEventDt = header.CreatedAt
+		}
+
+		return err == nil, err
+
+	}); err != nil {
+		log.Panic(err)
+	}
 }
 
 func (self *memStore) GetUserId(appId, email string) (string, error) {

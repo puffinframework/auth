@@ -38,7 +38,7 @@ func (self *serviceImpl) SignUp(appId, email, password string) (string, error) {
 	return EncodeVerification(Verification{Email: evt.Data.Email, UserId: evt.Data.Id}), nil
 }
 
-func (self *memStore) onSignedUp(evt SignedUpEvent) error {
+func (self *memStore) onSignedUpEvent(evt SignedUpEvent) error {
 	user := evt.Data
 	return self.createUser(user)
 }

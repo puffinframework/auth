@@ -14,7 +14,7 @@ func (self *memStore) MustProcessEvents() {
 		case "SignedUp":
 			evt := SignedUpEvent{Header: header}
 			self.eventStore.MustLoadEvent(header, &evt.Data)
-			err = self.onSignedUp(evt)
+			err = self.onSignedUpEvent(evt)
 		}
 
 		if err != nil {

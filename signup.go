@@ -13,9 +13,7 @@ type SignedUpEvent struct {
 }
 
 func (self *serviceImpl) SignUp(appId, email, password string) (string, error) {
-	if err := self.store.ProcessEvents(); err != nil {
-		return "", err
-	}
+	self.store.MustProcessEvents()
 
 	userId, err := self.store.GetUserId(appId, email)
 	if err != nil {

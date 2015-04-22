@@ -8,7 +8,7 @@ import (
 )
 
 type Store interface {
-	ProcessEvents() error
+	MustProcessEvents()
 	GetUserId(appId, email string) (string, error)
 }
 
@@ -23,25 +23,6 @@ type memStore struct {
 
 func NewMemStore(eventStore event.Store) Store {
 	return &memStore{eventStore: eventStore}
-}
-
-func (self *memStore) ProcessEvents() error {
-	return self.eventStore.ForEachEventHeader(self.LastEventDt, func(header event.Header) (bool, error) {
-		var err error
-
-		switch header.Type {
-		case "SignedUp":
-			evt := SignedUpEvent{Header: header}
-			self.eventStore.MustLoadEvent(header, &evt.Data)
-			self.onSignedUp(evt)
-		}
-
-		if err != nil {
-			self.LastEventDt = header.CreatedAt
-		}
-
-		return err == nil, err
-	})
 }
 
 func (self *memStore) GetUserId(appId, email string) (string, error) {

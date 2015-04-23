@@ -13,10 +13,15 @@ type SignedInEvent struct {
 	Data   Session
 }
 
-func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
-	sd := self.processEvents()
 
-	userId := sd.GetUserId(appId, email)
+func (self *serviceImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
+	self.store.mustProcessEvents()
+
+	userId, err := self.store.getUserId(appId, email)
+	if err != nil {
+		return "", err
+	}
+
 	hashedPassword := sd.GetHashedPassword(userId)
 
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
@@ -33,7 +38,7 @@ func (self *authServiceImpl) SignIn(appId, email, password string) (sessionToken
 		Data:   Session{UserId: userId, CreatedAt: time.Now()},
 	}
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return EncodeSession(evt.Data), nil
 }
 */

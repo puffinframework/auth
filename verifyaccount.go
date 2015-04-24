@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"github.com/puffinframework/event"
 )
@@ -10,15 +9,20 @@ type VerifiedAccountEvent struct {
 	Data   Verification
 }
 
-func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
-	sd := self.processEvents()
+func (self *serviceImpl) VerifyAccount(verificationToken string) error {
+	self.store.mustProcessEvents()
 
 	verification, err := DecodeVerification(verificationToken)
 	if err != nil {
 		return err
 	}
 
-	if sd.GetUserId(verification.AppId, verification.Email) != verification.UserId {
+	user, err := self.store.getUser(verification.UserId)
+	if err != nil {
+		return err
+	}
+
+	if user.Id == verification.UserId && user.Email == verification.Email {
 		return ErrVerificationDenied
 	}
 
@@ -27,10 +31,11 @@ func (self *authServiceImpl) VerifyAccount(verificationToken string) error {
 		Data:   verification,
 	}
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return nil
 }
 
+/*
 func (self *snapshotDataImpl) OnVerifiedAccount(evt VerifiedAccountEvent) error {
 	verification := evt.Data
 	self.setVerification(verification)

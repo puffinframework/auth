@@ -5,10 +5,10 @@ import "github.com/puffinframework/event"
 type Service interface {
 	// for users without a session
 	SignUp(appId, email, password string) (verificationToken string, err error)
+	VerifyAccount(verificationToken string) error
 	/*
-		OnSignedUp(evt SignedUpEvent) error
 		SignIn(appId, email, password string) (sessionToken string, err error)
-		VerifyAccount(verificationToken string) error
+
 		OnVerifiedAccount(evt VerifiedAccountEvent) error
 		RequestResetPassword(appId, email string) (resetToken string, err error)
 		ConfirmResetPassword(resetToken string, newPassword string) error

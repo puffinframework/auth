@@ -12,6 +12,7 @@ type Store interface {
 	mustProcessEvents()
 
 	getUserId(appId, email string) (string, error)
+	getUser(userId string) (User, error)
 
 	onSignedUpEvent(evt SignedUpEvent) error
 }
@@ -54,6 +55,10 @@ func (self *memStore) mustProcessEvents() {
 func (self *memStore) getUserId(appId, email string) (string, error) {
 	key := getUserIdKey(appId, email)
 	return self.UserIdByKey[key], nil
+}
+
+func (self *memStore) getUser(userId string) (User, error) {
+	return self.UserById[userId], nil
 }
 
 func (self *memStore) createUser(user User) error {

@@ -15,6 +15,7 @@ type Store interface {
 	getUser(userId string) (User, error)
 
 	onSignedUpEvent(evt SignedUpEvent) error
+	onVerifiedAccount(evt VerifiedAccountEvent) error
 }
 
 type memStore struct {
@@ -65,6 +66,11 @@ func (self *memStore) createUser(user User) error {
 	key := getUserIdKey(user.AppId, user.Email)
 	self.UserIdByKey[key] = user.Id
 	self.UserById[user.Id] = user
+	return nil
+}
+
+func (self *memStore) setVerification(verification Verification) error {
+	self.VerificationByUserId[verification.UserId] = verification
 	return nil
 }
 

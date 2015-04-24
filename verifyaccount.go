@@ -35,10 +35,7 @@ func (self *serviceImpl) VerifyAccount(verificationToken string) error {
 	return nil
 }
 
-/*
-func (self *snapshotDataImpl) OnVerifiedAccount(evt VerifiedAccountEvent) error {
+func (self *memStore) onVerifiedAccount(evt VerifiedAccountEvent) error {
 	verification := evt.Data
-	self.setVerification(verification)
-	return nil
+	return self.setVerification(verification)
 }
-*/

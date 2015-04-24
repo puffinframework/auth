@@ -47,6 +47,10 @@ func (self *memStore) mustProcessEvents() {
 			evt := VerifiedAccountEvent{Header: header}
 			self.eventStore.MustLoadEvent(header, &evt.Data)
 			err = self.onVerifiedAccount(evt)
+		case "RequestedResetPassword":
+			evt := RequestedResetPasswordEvent{Header: header}
+			self.eventStore.MustLoadEvent(header, &evt.Data)
+			err = self.onRequestedResetPassword(evt)
 		}
 
 		if err != nil {

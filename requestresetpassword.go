@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"time"
 
@@ -12,36 +11,38 @@ type RequestedResetPasswordEvent struct {
 	Data   Reset
 }
 
-func (self *authServiceImpl) RequestResetPassword(appId, email string) (resetToken string, err error) {
-	sd := self.processEvents()
+func (self *serviceImpl) RequestResetPassword(appId, email string) (resetToken string, err error) {
+	self.store.mustProcessEvents()
 
-	userId := sd.GetUserId(appId, email)
-	if userId == "" {
-		return "", ErrResetPasswordDenied
+	userId, err := self.store.getUserId(appId, email)
+	if err != nil {
+		return "", err
 	}
 
-	verification := sd.GetVerification(userId)
-	if verification.AppId != appId || verification.Email != email {
+	verification, err := self.store.getVerification(userId)
+	if err != nil {
+		return "", err
+	}
+
+	if verification.UserId != userId || verification.Email != email {
 		return "", ErrEmailNotVerified
 	}
 
 	evt := RequestedResetPasswordEvent{
 		Header: event.NewHeader("RequestedResetPassword", 1),
 		Data: Reset{
-			AppId:     appId,
 			Email:     email,
 			UserId:    userId,
 			CreatedAt: time.Now(),
 		},
 	}
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return EncodeReset(evt.Data), nil
 }
 
-func (self *snapshotDataImpl) OnRequestedResetPassword(evt RequestedResetPasswordEvent) error {
+func (self *memStore) onRequestedResetPassword(evt RequestedResetPasswordEvent) error {
 	reset := evt.Data
 	self.setReset(reset)
 	return nil
 }
-*/

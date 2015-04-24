@@ -18,6 +18,7 @@ type Store interface {
 
 	onSignedUp(evt SignedUpEvent) error
 	onVerifiedAccount(evt VerifiedAccountEvent) error
+	onRequestedResetPassword(evt RequestedResetPasswordEvent) error
 }
 
 type memStore struct {
@@ -86,6 +87,10 @@ func (self *memStore) createUser(user User) error {
 func (self *memStore) setVerification(verification Verification) error {
 	self.VerificationByUserId[verification.UserId] = verification
 	return nil
+}
+
+func (self *memStore) setReset(reset Reset) {
+	self.ResetByUserId[reset.UserId] = reset
 }
 
 func getUserIdKey(appId, email string) string {

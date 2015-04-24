@@ -7,9 +7,8 @@ type Service interface {
 	SignUp(appId, email, password string) (verificationToken string, err error)
 	VerifyAccount(verificationToken string) error
 	SignIn(appId, email, password string) (sessionToken string, err error)
+	RequestResetPassword(appId, email string) (resetToken string, err error)
 	/*
-
-		RequestResetPassword(appId, email string) (resetToken string, err error)
 		ConfirmResetPassword(resetToken string, newPassword string) error
 		// for users within a session
 		ChangeEmail(sessionToken, newEmail string) error

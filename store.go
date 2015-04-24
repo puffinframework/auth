@@ -14,7 +14,7 @@ type Store interface {
 	getUserId(appId, email string) (string, error)
 	getUser(userId string) (User, error)
 
-	onSignedUpEvent(evt SignedUpEvent) error
+	onSignedUp(evt SignedUpEvent) error
 	onVerifiedAccount(evt VerifiedAccountEvent) error
 }
 
@@ -39,7 +39,11 @@ func (self *memStore) mustProcessEvents() {
 		case "SignedUp":
 			evt := SignedUpEvent{Header: header}
 			self.eventStore.MustLoadEvent(header, &evt.Data)
-			err = self.onSignedUpEvent(evt)
+			err = self.onSignedUp(evt)
+		case "VerifiedAccount":
+			evt := VerifiedAccountEvent{Header: header}
+			self.eventStore.MustLoadEvent(header, &evt.Data)
+			err = self.onVerifiedAccount(evt)
 		}
 
 		if err != nil {

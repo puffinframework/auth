@@ -13,6 +13,8 @@ type Store interface {
 
 	getUserId(appId, email string) (string, error)
 	getUser(userId string) (User, error)
+	getHashedPassword(userId string) ([]byte, error)
+	getVerification(userId string) (Verification, error)
 
 	onSignedUp(evt SignedUpEvent) error
 	onVerifiedAccount(evt VerifiedAccountEvent) error
@@ -64,6 +66,14 @@ func (self *memStore) getUserId(appId, email string) (string, error) {
 
 func (self *memStore) getUser(userId string) (User, error) {
 	return self.UserById[userId], nil
+}
+
+func (self *memStore) getHashedPassword(userId string) ([]byte, error) {
+	return self.UserById[userId].HashedPassword, nil
+}
+
+func (self *memStore) getVerification(userId string) (Verification, error) {
+	return self.VerificationByUserId[userId], nil
 }
 
 func (self *memStore) createUser(user User) error {

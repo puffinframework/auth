@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"time"
 
@@ -13,7 +12,6 @@ type SignedInEvent struct {
 	Data   Session
 }
 
-
 func (self *serviceImpl) SignIn(appId, email, password string) (sessionToken string, err error) {
 	self.store.mustProcessEvents()
 
@@ -22,14 +20,21 @@ func (self *serviceImpl) SignIn(appId, email, password string) (sessionToken str
 		return "", err
 	}
 
-	hashedPassword := sd.GetHashedPassword(userId)
+	hashedPassword, err := self.store.getHashedPassword(userId)
+	if err != nil {
+		return "", err
+	}
 
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
 		return "", ErrSignInDenied
 	}
 
-	verification := sd.GetVerification(userId)
-	if verification.AppId != appId || verification.Email != email {
+	verification, err := self.store.getVerification(userId)
+	if err != nil {
+		return "", err
+	}
+
+	if verification.UserId != userId || verification.Email != email {
 		return "", ErrEmailNotVerified
 	}
 
@@ -41,4 +46,3 @@ func (self *serviceImpl) SignIn(appId, email, password string) (sessionToken str
 	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return EncodeSession(evt.Data), nil
 }
-*/

@@ -15,6 +15,7 @@ type Store interface {
 	getUser(userId string) (User, error)
 	getHashedPassword(userId string) ([]byte, error)
 	getVerification(userId string) (Verification, error)
+	getReset(userId string) (Reset, error)
 
 	onSignedUp(evt SignedUpEvent) error
 	onVerifiedAccount(evt VerifiedAccountEvent) error
@@ -79,6 +80,10 @@ func (self *memStore) getHashedPassword(userId string) ([]byte, error) {
 
 func (self *memStore) getVerification(userId string) (Verification, error) {
 	return self.VerificationByUserId[userId], nil
+}
+
+func (self *memStore) getReset(userId string) (Reset, error) {
+	return self.ResetByUserId[userId], nil
 }
 
 func (self *memStore) createUser(user User) error {

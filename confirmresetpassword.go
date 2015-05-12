@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"github.com/puffinframework/event"
 
@@ -15,19 +14,16 @@ type ConfirmedResetPasswordEvent struct {
 	}
 }
 
-func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword string) error {
-	sd := self.processEvents()
+func (self *serviceImpl) ConfirmResetPassword(resetToken string, newPassword string) error {
+	self.store.mustProcessEvents()
 
 	reset, err := DecodeReset(resetToken)
 	if err != nil {
 		return err
 	}
 
-	if sd.GetUserId(reset.AppId, reset.Email) != reset.UserId {
-		return ErrResetPasswordDenied
-	}
-
-	if sd.GetReset(reset.UserId).UserId != reset.UserId {
+	storedReset, err := self.store.getReset(reset.UserId)
+	if storedReset.UserId != reset.UserId || storedReset.Email != reset.Email {
 		return ErrResetPasswordDenied
 	}
 
@@ -42,11 +38,12 @@ func (self *authServiceImpl) ConfirmResetPassword(resetToken string, newPassword
 	evt.Data.UserId = reset.UserId
 	evt.Data.HashedPassword = hashedPassword
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return nil
 }
 
-func (self *snapshotDataImpl) OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error {
+/*
+func (self *memStore) OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error {
 	data := evt.Data
 	self.delReset(data.UserId)
 	self.setHashedPassword(data.UserId, data.HashedPassword)

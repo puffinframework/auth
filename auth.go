@@ -9,9 +9,9 @@ type Service interface {
 	SignIn(appId, email, password string) (sessionToken string, err error)
 	RequestResetPassword(appId, email string) (resetToken string, err error)
 	ConfirmResetPassword(resetToken string, newPassword string) error
+	// for users within a session
+	ChangeEmail(sessionToken, newEmail string) error
 	/*
-		// for users within a session
-		ChangeEmail(sessionToken, newEmail string) error
 		ChangePassword(sessionToken, oldPassword, newPassword string) error
 		// for admins
 		CreateUser(adminToken, appId, email, password string) error

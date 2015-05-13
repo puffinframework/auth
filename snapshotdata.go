@@ -107,18 +107,4 @@ func (self *snapshotDataImpl) setVerificationForUser(user User) {
 func (self *snapshotDataImpl) setReset(reset Reset) {
 	self.ResetByUserId[reset.UserId] = reset
 }
-
-func (self *snapshotDataImpl) setEmail(userId, email string) {
-	user := self.UserById[userId]
-	oldEmail := user.Email
-
-	user.Email = email
-	self.UserById[userId] = user
-
-	oldKey := getUserIdKey(user.AppId, oldEmail)
-	delete(self.UserIdByKey, oldKey)
-
-	newKey := getUserIdKey(user.AppId, email)
-	self.UserIdByKey[newKey] = userId
-}
 */

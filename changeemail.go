@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"github.com/puffinframework/event"
 )
@@ -13,16 +12,24 @@ type ChangedEmailEvent struct {
 	}
 }
 
-func (self *authServiceImpl) ChangeEmail(sessionToken, newEmail string) error {
-	sd := self.processEvents()
+func (self *serviceImpl) ChangeEmail(sessionToken, newEmail string) error {
+	self.store.mustProcessEvents()
 
 	session, err := DecodeSession(sessionToken)
 	if err != nil {
 		return err
 	}
 
-	appId := sd.GetAppId(session.UserId)
-	if sd.GetUserId(appId, newEmail) != "" {
+	appId, err := self.store.getAppId(session.UserId)
+	if err != nil {
+		return err
+	}
+
+	userId, err := self.store.getUserId(appId, newEmail)
+	if err != nil {
+		return err
+	}
+	if userId != "" {
 		return ErrEmailAlreadyUsed
 	}
 
@@ -32,13 +39,12 @@ func (self *authServiceImpl) ChangeEmail(sessionToken, newEmail string) error {
 	evt.Data.UserId = session.UserId
 	evt.Data.Email = newEmail
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return nil
 }
 
-func (self *snapshotDataImpl) OnChangedEmail(evt ChangedEmailEvent) error {
+func (self *memStore) onChangedEmail(evt ChangedEmailEvent) error {
 	data := evt.Data
 	self.setEmail(data.UserId, data.Email)
 	return nil
 }
-*/

@@ -16,11 +16,13 @@ type Store interface {
 	getHashedPassword(userId string) ([]byte, error)
 	getVerification(userId string) (Verification, error)
 	getReset(userId string) (Reset, error)
+	getAppId(userId string) (string, error)
 
 	onSignedUp(evt SignedUpEvent) error
 	onVerifiedAccount(evt VerifiedAccountEvent) error
 	onRequestedResetPassword(evt RequestedResetPasswordEvent) error
 	onConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error
+	onChangedEmail(evt ChangedEmailEvent) error
 }
 
 type memStore struct {
@@ -91,6 +93,10 @@ func (self *memStore) getReset(userId string) (Reset, error) {
 	return self.ResetByUserId[userId], nil
 }
 
+func (self *memStore) getAppId(userId string) (string, error) {
+	return self.UserById[userId].AppId, nil
+}
+
 func (self *memStore) createUser(user User) error {
 	key := getUserIdKey(user.AppId, user.Email)
 	self.UserIdByKey[key] = user.Id
@@ -115,6 +121,20 @@ func (self *memStore) setHashedPassword(userId string, hashedPassword []byte) {
 	user := self.UserById[userId]
 	user.HashedPassword = hashedPassword
 	self.UserById[userId] = user
+}
+
+func (self *memStore) setEmail(userId, email string) {
+	user := self.UserById[userId]
+	oldEmail := user.Email
+
+	user.Email = email
+	self.UserById[userId] = user
+
+	oldKey := getUserIdKey(user.AppId, oldEmail)
+	delete(self.UserIdByKey, oldKey)
+
+	newKey := getUserIdKey(user.AppId, email)
+	self.UserIdByKey[newKey] = userId
 }
 
 func getUserIdKey(appId, email string) string {

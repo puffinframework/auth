@@ -20,6 +20,7 @@ type Store interface {
 	onSignedUp(evt SignedUpEvent) error
 	onVerifiedAccount(evt VerifiedAccountEvent) error
 	onRequestedResetPassword(evt RequestedResetPasswordEvent) error
+	onConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error
 }
 
 type memStore struct {
@@ -52,6 +53,10 @@ func (self *memStore) mustProcessEvents() {
 			evt := RequestedResetPasswordEvent{Header: header}
 			self.eventStore.MustLoadEvent(header, &evt.Data)
 			err = self.onRequestedResetPassword(evt)
+		case "ConfirmedResetPassword":
+			evt := ConfirmedResetPasswordEvent{Header: header}
+			self.eventStore.MustLoadEvent(header, &evt.Data)
+			err = self.onConfirmedResetPassword(evt)
 		}
 
 		if err != nil {
@@ -100,6 +105,16 @@ func (self *memStore) setVerification(verification Verification) error {
 
 func (self *memStore) setReset(reset Reset) {
 	self.ResetByUserId[reset.UserId] = reset
+}
+
+func (self *memStore) delReset(userId string) {
+	delete(self.ResetByUserId, userId)
+}
+
+func (self *memStore) setHashedPassword(userId string, hashedPassword []byte) {
+	user := self.UserById[userId]
+	user.HashedPassword = hashedPassword
+	self.UserById[userId] = user
 }
 
 func getUserIdKey(appId, email string) string {

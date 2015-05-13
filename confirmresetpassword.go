@@ -42,11 +42,9 @@ func (self *serviceImpl) ConfirmResetPassword(resetToken string, newPassword str
 	return nil
 }
 
-/*
-func (self *memStore) OnConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error {
+func (self *memStore) onConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error {
 	data := evt.Data
 	self.delReset(data.UserId)
 	self.setHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }
-*/

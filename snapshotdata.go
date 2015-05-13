@@ -60,10 +60,6 @@ func getUserIdKey(appId, email string) string {
 	return strings.Join([]string{appId, email}, "::")
 }
 
-func (self *snapshotDataImpl) GetReset(userId string) Reset {
-	return self.ResetByUserId[userId]
-}
-
 func (self *snapshotDataImpl) GetUserAuthorization(userId, authorizationId string) UserAuthorization {
 	key := getUserAuthorizationKey(userId, authorizationId)
 	return self.UserAuthorizationByKey[key]
@@ -108,18 +104,8 @@ func (self *snapshotDataImpl) setVerificationForUser(user User) {
 	self.setVerification(verification)
 }
 
-func (self *snapshotDataImpl) setHashedPassword(userId string, hashedPassword []byte) {
-	user := self.UserById[userId]
-	user.HashedPassword = hashedPassword
-	self.UserById[userId] = user
-}
-
 func (self *snapshotDataImpl) setReset(reset Reset) {
 	self.ResetByUserId[reset.UserId] = reset
-}
-
-func (self *snapshotDataImpl) delReset(userId string) {
-	delete(self.ResetByUserId, userId)
 }
 
 func (self *snapshotDataImpl) setEmail(userId, email string) {

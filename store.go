@@ -59,6 +59,10 @@ func (self *memStore) mustProcessEvents() {
 			evt := ConfirmedResetPasswordEvent{Header: header}
 			self.eventStore.MustLoadEvent(header, &evt.Data)
 			err = self.onConfirmedResetPassword(evt)
+		case "ChangedEmail":
+			evt := ChangedEmailEvent{Header: header}
+			self.eventStore.MustLoadEvent(header, &evt.Data)
+			err = self.onChangedEmail(evt)
 		}
 
 		if err != nil {

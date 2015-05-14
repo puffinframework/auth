@@ -21,7 +21,7 @@ func (self *serviceImpl) UpdateUserEmail(adminToken, userId, newEmail string) er
 	return nil
 }
 
-func (self *memStore) OnUpdatedUserEmail(evt UpdatedUserEmailEvent) error {
+func (self *memStore) onUpdatedUserEmail(evt UpdatedUserEmailEvent) error {
 	data := evt.Data
 	self.setEmail(data.UserId, data.Email)
 	return nil

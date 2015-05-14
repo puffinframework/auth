@@ -24,6 +24,7 @@ type Store interface {
 	onConfirmedResetPassword(evt ConfirmedResetPasswordEvent) error
 	onChangedEmail(evt ChangedEmailEvent) error
 	onChangedPassword(evt ChangedPasswordEvent) error
+	onCreatedUser(evt CreatedUserEvent) error
 }
 
 type memStore struct {
@@ -68,6 +69,10 @@ func (self *memStore) mustProcessEvents() {
 			evt := ChangedPasswordEvent{Header: header}
 			self.eventStore.MustLoadEvent(header, &evt.Data)
 			err = self.onChangedPassword(evt)
+		case "CreatedUser":
+			evt := CreatedUserEvent{Header: header}
+			self.eventStore.MustLoadEvent(header, &evt.Data)
+			err = self.onCreatedUser(evt)
 		}
 
 		if err != nil {

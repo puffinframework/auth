@@ -40,7 +40,7 @@ func (self *serviceImpl) CreateUser(adminToken, appId, email, password string) e
 	return nil
 }
 
-func (self *memStore) OnCreatedUser(evt CreatedUserEvent) error {
+func (self *memStore) onCreatedUser(evt CreatedUserEvent) error {
 	user := evt.Data
 	self.createUser(user)
 	self.setVerificationForUser(user)

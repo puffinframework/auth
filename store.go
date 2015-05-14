@@ -166,6 +166,17 @@ func (self *memStore) setEmail(userId, email string) {
 	self.UserIdByKey[newKey] = userId
 }
 
+func (self *memStore) removeUser(userId string) {
+	user := self.UserById[userId]
+
+	delete(self.UserById, userId)
+	delete(self.VerificationByUserId, userId)
+	delete(self.ResetByUserId, userId)
+
+	key := getUserIdKey(user.AppId, user.Email)
+	delete(self.UserIdByKey, key)
+}
+
 func getUserIdKey(appId, email string) string {
 	return strings.Join([]string{appId, email}, "_")
 }

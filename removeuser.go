@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"github.com/puffinframework/event"
 )
@@ -12,29 +11,20 @@ type RemovedUserEvent struct {
 	}
 }
 
-func (self *authServiceImpl) RemoveUser(sessionToken, authorizationId, userId string) error {
-	sd := self.processEvents()
+func (self *serviceImpl) RemoveUser(adminToken, userId string) error {
+	self.store.mustProcessEvents()
 
-	session, err := DecodeSession(sessionToken)
-	if err != nil {
-		return err
-	}
-
-	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
-	if !authorization.IsAuthorized {
-		return ErrNotAuthorized
-	}
+	// TODO check adminToken
 
 	evt := RemovedUserEvent{Header: event.NewHeader("RemovedUser", 1)}
 	evt.Data.UserId = userId
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return nil
 }
 
-func (self *snapshotDataImpl) OnRemovedUser(evt RemovedUserEvent) error {
+func (self *memStore) OnRemovedUser(evt RemovedUserEvent) error {
 	userId := evt.Data.UserId
 	self.removeUser(userId)
 	return nil
 }
-*/

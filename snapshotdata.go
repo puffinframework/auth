@@ -78,22 +78,7 @@ func getUserAuthorizationKey(userId, authorizationId string) string {
 }
 
 
-func (self *snapshotDataImpl) removeUser(userId string) {
-	user := self.UserById[userId]
 
-	delete(self.UserById, userId)
-	delete(self.VerificationByUserId, userId)
-	delete(self.ResetByUserId, userId)
-
-	key := getUserIdKey(user.AppId, user.Email)
-	delete(self.UserIdByKey, key)
-
-	for key, userAuthorization := range self.UserAuthorizationByKey {
-		if userAuthorization.UserId == userId {
-			delete(self.UserAuthorizationByKey, key)
-		}
-	}
-}
 
 func (self *snapshotDataImpl) setVerification(verification Verification) {
 	self.VerificationByUserId[verification.UserId] = verification

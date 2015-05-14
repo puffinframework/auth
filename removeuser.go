@@ -23,7 +23,7 @@ func (self *serviceImpl) RemoveUser(adminToken, userId string) error {
 	return nil
 }
 
-func (self *memStore) OnRemovedUser(evt RemovedUserEvent) error {
+func (self *memStore) onRemovedUser(evt RemovedUserEvent) error {
 	userId := evt.Data.UserId
 	self.removeUser(userId)
 	return nil

@@ -11,8 +11,8 @@ type Service interface {
 	ConfirmResetPassword(resetToken string, newPassword string) error
 	// for users within a session
 	ChangeEmail(sessionToken, newEmail string) error
+	ChangePassword(sessionToken, oldPassword, newPassword string) error
 	/*
-		ChangePassword(sessionToken, oldPassword, newPassword string) error
 		// for admins
 		CreateUser(adminToken, appId, email, password string) error
 		OnCreatedUser(evt CreatedUserEvent) error

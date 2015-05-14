@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"github.com/puffinframework/event"
 
@@ -15,15 +14,18 @@ type ChangedPasswordEvent struct {
 	}
 }
 
-func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {
-	sd := self.processEvents()
+func (self *serviceImpl) ChangePassword(sessionToken, oldPassword, newPassword string) error {
+	self.store.mustProcessEvents()
 
 	session, err := DecodeSession(sessionToken)
 	if err != nil {
 		return err
 	}
 
-	hashedPassword := sd.GetHashedPassword(session.UserId)
+	hashedPassword, err := self.store.getHashedPassword(session.UserId)
+	if err != nil {
+		return err
+	}
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(oldPassword)); err != nil {
 		return ErrChangePasswordDenied
 	}
@@ -39,13 +41,12 @@ func (self *authServiceImpl) ChangePassword(sessionToken, oldPassword, newPasswo
 	evt.Data.UserId = session.UserId
 	evt.Data.HashedPassword = newHashedPassword
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return nil
 }
 
-func (self *snapshotDataImpl) OnChangedPassword(evt ChangedPasswordEvent) error {
+func (self *memStore) onChangedPassword(evt ChangedPasswordEvent) error {
 	data := evt.Data
 	self.setHashedPassword(data.UserId, data.HashedPassword)
 	return nil
 }
-*/

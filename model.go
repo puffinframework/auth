@@ -4,11 +4,6 @@ import (
 	"time"
 )
 
-type AdminToken struct {
-	AccessKey string
-	SecretKey []byte
-}
-
 type User struct {
 	Id             string
 	AppId          string

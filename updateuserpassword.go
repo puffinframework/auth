@@ -8,10 +8,8 @@ import (
 
 type UpdatedUserPasswordEvent ChangedPasswordEvent
 
-func (self *serviceImpl) UpdateUserPassword(adminToken, userId, newPassword string) error {
+func (self *serviceImpl) UpdateUserPassword(userId, newPassword string) error {
 	self.store.mustProcessEvents()
-
-	// TODO check adminToken
 
 	newHashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
 	if err != nil {

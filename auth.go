@@ -13,18 +13,17 @@ type Service interface {
 	ChangeEmail(sessionToken, newEmail string) error
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
 	// for admins
-	CreateUser(adminToken, appId, email, password string) error
-	UpdateUserEmail(adminToken, userId, newEmail string) error
-	UpdateUserPassword(adminToken, userId, newPassword string) error
-	RemoveUser(adminToken, userId string) error
+	CreateUser(appId, email, password string) error
+	UpdateUserEmail(userId, newEmail string) error
+	UpdateUserPassword(userId, newPassword string) error
+	RemoveUser(userId string) error
 }
 
 type serviceImpl struct {
-	eventStore  event.Store
-	store       Store
-	adminTokens []AdminToken
+	eventStore event.Store
+	store      Store
 }
 
-func NewService(eventStore event.Store, store Store, adminTokens []AdminToken) Service {
-	return &serviceImpl{eventStore: eventStore, store: store, adminTokens: adminTokens}
+func NewService(eventStore event.Store, store Store) Service {
+	return &serviceImpl{eventStore: eventStore, store: store}
 }

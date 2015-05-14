@@ -12,10 +12,8 @@ type CreatedUserEvent struct {
 	Data   User
 }
 
-func (self *serviceImpl) CreateUser(adminToken, appId, email, password string) error {
+func (self *serviceImpl) CreateUser(appId, email, password string) error {
 	self.store.mustProcessEvents()
-
-	// TODO check adminToken
 
 	userId, err := self.store.getUserId(appId, email)
 	if err != nil {

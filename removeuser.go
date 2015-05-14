@@ -11,10 +11,8 @@ type RemovedUserEvent struct {
 	}
 }
 
-func (self *serviceImpl) RemoveUser(adminToken, userId string) error {
+func (self *serviceImpl) RemoveUser(userId string) error {
 	self.store.mustProcessEvents()
-
-	// TODO check adminToken
 
 	evt := RemovedUserEvent{Header: event.NewHeader("RemovedUser", 1)}
 	evt.Data.UserId = userId

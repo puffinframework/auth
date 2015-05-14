@@ -6,10 +6,8 @@ import (
 
 type UpdatedUserEmailEvent ChangedEmailEvent
 
-func (self *serviceImpl) UpdateUserEmail(adminToken, userId, newEmail string) error {
+func (self *serviceImpl) UpdateUserEmail(userId, newEmail string) error {
 	self.store.mustProcessEvents()
-
-	// TODO check adminToken
 
 	evt := UpdatedUserEmailEvent{
 		Header: event.NewHeader("UpdatedUserEmail", 1),

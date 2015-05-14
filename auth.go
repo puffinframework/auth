@@ -15,10 +15,8 @@ type Service interface {
 	// for admins
 	CreateUser(adminToken, appId, email, password string) error
 	UpdateUserEmail(adminToken, userId, newEmail string) error
-	/*
-		UpdateUserPassword(adminToken, userId, newPassword string) error
-		RemoveUser(adminToken, userId string) error
-	*/
+	//UpdateUserPassword(adminToken, userId, newPassword string) error
+	//RemoveUser(adminToken, userId string) error
 }
 
 type serviceImpl struct {

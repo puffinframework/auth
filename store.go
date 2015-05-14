@@ -118,6 +118,11 @@ func (self *memStore) setVerification(verification Verification) error {
 	return nil
 }
 
+func (self *memStore) setVerificationForUser(user User) {
+	verification := Verification{UserId: user.Id, Email: user.Email}
+	self.setVerification(verification)
+}
+
 func (self *memStore) setReset(reset Reset) {
 	self.ResetByUserId[reset.UserId] = reset
 }

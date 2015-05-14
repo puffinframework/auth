@@ -12,9 +12,9 @@ type Service interface {
 	// for users within a session
 	ChangeEmail(sessionToken, newEmail string) error
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
+	// for admins
+	CreateUser(adminToken, appId, email, password string) error
 	/*
-		// for admins
-		CreateUser(adminToken, appId, email, password string) error
 		OnCreatedUser(evt CreatedUserEvent) error
 		UpdateUserPassword(adminToken, userId, newPassword string) error
 		UpdateUserEmail(adminToken, userId, newEmail string) error

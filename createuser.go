@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"github.com/puffinframework/event"
 
@@ -13,20 +12,17 @@ type CreatedUserEvent struct {
 	Data   User
 }
 
-func (self *authServiceImpl) CreateUser(sessionToken, authorizationId, appId, email, password string) error {
-	sd := self.processEvents()
+func (self *serviceImpl) CreateUser(adminToken, appId, email, password string) error {
+	self.store.mustProcessEvents()
 
-	session, err := DecodeSession(sessionToken)
+	// TODO check adminToken
+
+	userId, err := self.store.getUserId(appId, email)
 	if err != nil {
 		return err
 	}
 
-	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
-	if !authorization.IsAuthorized {
-		return ErrNotAuthorized
-	}
-
-	if sd.GetUserId(appId, email) != "" {
+	if userId != "" {
 		return ErrEmailAlreadyUsed
 	}
 
@@ -40,14 +36,13 @@ func (self *authServiceImpl) CreateUser(sessionToken, authorizationId, appId, em
 		Data:   User{AppId: appId, Id: uuid.NewV1().String(), Email: email, HashedPassword: hashedPassword},
 	}
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return nil
 }
 
-func (self *snapshotDataImpl) OnCreatedUser(evt CreatedUserEvent) error {
+func (self *memStore) OnCreatedUser(evt CreatedUserEvent) error {
 	user := evt.Data
 	self.createUser(user)
 	self.setVerificationForUser(user)
 	return nil
 }
-*/

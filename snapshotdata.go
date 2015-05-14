@@ -99,10 +99,6 @@ func (self *snapshotDataImpl) setVerification(verification Verification) {
 	self.VerificationByUserId[verification.UserId] = verification
 }
 
-func (self *snapshotDataImpl) setVerificationForUser(user User) {
-	verification := Verification{AppId: user.AppId, Email: user.Email, UserId: user.Id}
-	self.setVerification(verification)
-}
 
 func (self *snapshotDataImpl) setReset(reset Reset) {
 	self.ResetByUserId[reset.UserId] = reset

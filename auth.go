@@ -14,10 +14,9 @@ type Service interface {
 	ChangePassword(sessionToken, oldPassword, newPassword string) error
 	// for admins
 	CreateUser(adminToken, appId, email, password string) error
+	UpdateUserEmail(adminToken, userId, newEmail string) error
 	/*
-		OnCreatedUser(evt CreatedUserEvent) error
 		UpdateUserPassword(adminToken, userId, newPassword string) error
-		UpdateUserEmail(adminToken, userId, newEmail string) error
 		RemoveUser(adminToken, userId string) error
 	*/
 }

@@ -1,38 +1,28 @@
 package auth
 
-/*
 import (
 	"github.com/puffinframework/event"
 )
 
-type ChangedUserEmailEvent ChangedEmailEvent
+type UpdatedUserEmailEvent ChangedEmailEvent
 
-func (self *authServiceImpl) ChangeUserEmail(sessionToken, authorizationId, userId, newEmail string) error {
-	sd := self.processEvents()
+func (self *serviceImpl) UpdateUserEmail(adminToken, userId, newEmail string) error {
+	self.store.mustProcessEvents()
 
-	session, err := DecodeSession(sessionToken)
-	if err != nil {
-		return err
+	// TODO check adminToken
+
+	evt := UpdatedUserEmailEvent{
+		Header: event.NewHeader("UpdatedUserEmail", 1),
 	}
-
-	authorization := sd.GetUserAuthorization(session.UserId, authorizationId)
-	if !authorization.IsAuthorized {
-		return ErrNotAuthorized
-	}
-
-	evt := ChangedUserEmailEvent{
-		Header: event.NewHeader("ChangedEmail", 1),
-	}
-	evt.Data.UserId = session.UserId
+	evt.Data.UserId = userId
 	evt.Data.Email = newEmail
 
-	self.es.MustSaveEventData(evt.Header, evt.Data)
+	self.eventStore.MustSaveEvent(evt.Header, evt.Data)
 	return nil
 }
 
-func (self *snapshotDataImpl) OnChangedUserEmail(evt ChangedUserEmailEvent) error {
+func (self *memStore) OnUpdatedUserEmail(evt UpdatedUserEmailEvent) error {
 	data := evt.Data
 	self.setEmail(data.UserId, data.Email)
 	return nil
 }
-*/

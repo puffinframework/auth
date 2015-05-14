@@ -28,7 +28,7 @@ func (self *serviceImpl) UpdateUserPassword(adminToken, userId, newPassword stri
 	return nil
 }
 
-func (self *memStore) OnUpdatedUserPassword(evt UpdatedUserPasswordEvent) error {
+func (self *memStore) onUpdatedUserPassword(evt UpdatedUserPasswordEvent) error {
 	data := evt.Data
 	self.setHashedPassword(data.UserId, data.HashedPassword)
 	return nil
